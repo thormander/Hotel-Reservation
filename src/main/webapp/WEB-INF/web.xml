@@ -1,9 +1,79 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://jakarta.ee/xml/ns/jakartaee" xmlns:web="http://xmlns.jcp.org/xml/ns/javaee" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd http://xmlns.jcp.org/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" id="WebApp_ID" version="5.0">
-  <display-name>hotelMain</display-name>
+  <display-name>hotelMASTER</display-name>
   <welcome-file-list>
-    <welcome-file>index.jsp</welcome-file>
+    <welcome-file>login.jsp</welcome-file>
   </welcome-file-list>
+  <servlet>
+    <description></description>
+    <display-name>loginAdminServlet</display-name>
+    <servlet-name>loginAdminServlet</servlet-name>
+    <servlet-class>com.hotel.loginlogout.loginAdminServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>loginAdminServlet</servlet-name>
+    <url-pattern>/loginAdminServlet</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>loginClerkServlet</display-name>
+    <servlet-name>loginClerkServlet</servlet-name>
+    <servlet-class>com.hotel.loginlogout.loginClerkServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>loginClerkServlet</servlet-name>
+    <url-pattern>/loginClerkServlet</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>loginServlet</display-name>
+    <servlet-name>loginServlet</servlet-name>
+    <servlet-class>com.hotel.loginlogout.loginServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>loginServlet</servlet-name>
+    <url-pattern>/loginServlet</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>logoutServlet</display-name>
+    <servlet-name>logoutServlet</servlet-name>
+    <servlet-class>com.hotel.loginlogout.logoutServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>logoutServlet</servlet-name>
+    <url-pattern>/logoutServlet</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>ModifyClerkServlet</display-name>
+    <servlet-name>ModifyClerkServlet</servlet-name>
+    <servlet-class>com.hotel.modify.ModifyClerkServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ModifyClerkServlet</servlet-name>
+    <url-pattern>/ModifyClerkServlet</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>ModifyGuestServlet</display-name>
+    <servlet-name>ModifyGuestServlet</servlet-name>
+    <servlet-class>com.hotel.modify.ModifyGuestServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ModifyGuestServlet</servlet-name>
+    <url-pattern>/ModifyGuestServlet</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>RegistrationClerkServlet</display-name>
+    <servlet-name>RegistrationClerkServlet</servlet-name>
+    <servlet-class>com.hotel.registration.RegistrationClerkServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>RegistrationClerkServlet</servlet-name>
+    <url-pattern>/RegistrationClerkServlet</url-pattern>
+  </servlet-mapping>
   <servlet>
     <description></description>
     <display-name>RegistrationServlet</display-name>
@@ -16,22 +86,42 @@
   </servlet-mapping>
   <servlet>
     <description></description>
-    <display-name>loginServlet</display-name>
-    <servlet-name>loginServlet</servlet-name>
-    <servlet-class>com.hotel.registration.loginServlet</servlet-class>
+    <display-name>RoomDashboardServlet</display-name>
+    <servlet-name>RoomDashboardServlet</servlet-name>
+    <servlet-class>com.hotel.roomdashboard.RoomDashboardServlet</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name>loginServlet</servlet-name>
-    <url-pattern>/loginServlet</url-pattern>
+    <servlet-name>RoomDashboardServlet</servlet-name>
+    <url-pattern>/RoomDashboardServlet</url-pattern>
   </servlet-mapping>
   <servlet>
     <description></description>
-    <display-name>logoutServlet</display-name>
-    <servlet-name>logoutServlet</servlet-name>
-    <servlet-class>com.hotel.registration.logoutServlet</servlet-class>
+    <display-name>RoomDashboard</display-name>
+    <servlet-name>RoomDashboard</servlet-name>
+    <servlet-class>com.hotel.roomdashboard.RoomDashboard</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name>logoutServlet</servlet-name>
-    <url-pattern>/logoutServlet</url-pattern>
+    <servlet-name>RoomDashboard</servlet-name>
+    <url-pattern>/RoomDashboard</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>Rooms</display-name>
+    <servlet-name>Rooms</servlet-name>
+    <servlet-class>com.hotel.roomdashboard.Rooms</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Rooms</servlet-name>
+    <url-pattern>/Rooms</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>RoomHandler</display-name>
+    <servlet-name>RoomHandler</servlet-name>
+    <servlet-class>com.hotel.roomdashboard.RoomHandler</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>RoomHandler</servlet-name>
+    <url-pattern>/RoomHandler</url-pattern>
   </servlet-mapping>
 </web-app>

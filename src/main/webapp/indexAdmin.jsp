@@ -1,10 +1,20 @@
+<%
+	if(session.getAttribute("name")==null)
+	{
+		response.sendRedirect("loginAdmin.jsp");
+	}
+%>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<title>Sign Up Form</title>
+<meta charset="utf-8" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<meta name="description" content="" />
+<meta name="author" content="" />
+<title>Coding Ninja's Hotel</title>
 
 <script>
 function showErrorMessage() {
@@ -16,6 +26,7 @@ function showErrorMessage() {
 </script>
 
 </head>
+<!------------------------------------------------------------------------------------------------------------------->
 <body>
 
   <%
@@ -28,45 +39,38 @@ function showErrorMessage() {
   <%
     }
   %>
-
-<input type="hidden" id="status" value="<%= request.getAttribute("status") %>">
-
-	<div class="main">
+ 
+<h1>Welcome Admin!</h1>
 
 		<!-- Sign up form -->
 		<section class="signup">
 			<div class="container">
 				<div class="signup-content">
 					<div class="signup-form">
-						<h2 class="form-title">Guest Account Creation</h2>
-						<form method="post" action="register" class="register-form"
+						<h2 class="form-title">Clerk Account Creation</h2>
+
+						<form method="post" action="registerClerk" class="register-form"
 							id="register-form">
 							<div class="form-group">
 								<label for="name"><i
 									class="zmdi zmdi-account material-icons-name"></i></label> <input
-									type="text" name="name" id="name" placeholder="Your Name" required="required"/>
-							</div>
+									type="text" name="name" id="name" placeholder="Clerk Name" required="required"/>
+							</div>							
 							<div class="form-group">
 								<label for="email"><i class="zmdi zmdi-email"></i></label> <input
-									type="email" name="email" id="email" placeholder="Your Email" required="required"/>
+									type="email" name="email" id="email" placeholder="Clerk Email" required="required"/>
 							</div>
 							<div class="form-group">
 								<label for="pass"><i class="zmdi zmdi-lock"></i></label> <input
-									type="password" name="pass" id="pass" placeholder="Password" required="required"/>
+									type="password" name="pass" id="pass" placeholder="Clerk Password" required="required"/>
 							</div>
 							<div class="form-group form-button">
-								<input type="submit" name="signup" id="signup"
-									class="form-submit" value="Register" />
+								<input type="submit" class="form-submit" value="Create" />
 							</div>
 						</form>
-					</div>
-					<div class="signup-image">
-						<a href="login.jsp" class="signup-image-link">Already have an account?</a>
 					</div>
 				</div>
 			</div>
 		</section>
-	</div>
-	
 </body>
 </html>

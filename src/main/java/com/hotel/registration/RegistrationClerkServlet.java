@@ -13,8 +13,8 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 
-@WebServlet("/register") //connection to the .jsp file for intake of data
-public class RegistrationServlet extends HttpServlet {
+@WebServlet("/registerClerk") //connection to the .jsp file for intake of data
+public class RegistrationClerkServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -23,29 +23,23 @@ public class RegistrationServlet extends HttpServlet {
 		String uemail = request.getParameter("email");
 		String upass = request.getParameter("pass");
 		
-		if (uemail == "") 
-		{
-			
-		}
-		
 		RequestDispatcher dispatcher = null;
 		Connection con = null;
 		
 		try 
 		{
 			Class.forName("com.mysql.cj.jdbc.Driver");
-			
 			//CONNECTION TO DB (change "hotel" to whatever you database name is.)
 			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false","root", "1234");
-			//SQL query to database here
-			PreparedStatement pst = con.prepareStatement("INSERT INTO account(user_name,email_id,password,type) values(?,?,?,'guest')");
+			//SQL query to database here. (PLEASE NAME YOUR DB TO hotel)
+			PreparedStatement pst = con.prepareStatement("INSERT INTO account(user_name,email_id,password,type) values(?,?,?,'clerk')");
 			pst.setString(1, username);
 			pst.setString(2, uemail);
 			pst.setString(3, upass);
 			
 			int rowCount = pst.executeUpdate();
 			
-			dispatcher = request.getRequestDispatcher("registration.jsp");
+			dispatcher = request.getRequestDispatcher("indexAdmin.jsp");
 			if (rowCount > 0)
 			{
 				request.setAttribute("status", "success");
@@ -62,12 +56,12 @@ public class RegistrationServlet extends HttpServlet {
 		{
 		    request.setAttribute("errorMessage", "Email already exists");
 		    request.setAttribute("showError", "true");
-		    request.getRequestDispatcher("/registration.jsp").forward(request, response);
+		    request.getRequestDispatcher("/indexAdmin.jsp").forward(request, response);
 		}
 		catch (Exception e) 
 		{
 			e.printStackTrace();
-		}
+		} 
 		finally
 		{
 			try
@@ -80,5 +74,4 @@ public class RegistrationServlet extends HttpServlet {
 			}
 		}
 	}
-
 }

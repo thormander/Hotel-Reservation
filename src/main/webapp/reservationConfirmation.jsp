@@ -1,10 +1,3 @@
-<%
-	if(session.getAttribute("name")==null)
-	{
-		response.sendRedirect("login.jsp");
-	}
-%>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -18,8 +11,7 @@
 
 <!------------------------------------------------------------------------------------------------------------------->
 <body>
-	<a href="modifyGuest.jsp">Modify Account?</a>
-	<h1>Welcome!</h1>
+	<h1>Confirmed!</h1>
 
 
 </body>

@@ -1,7 +1,7 @@
 <%
 	if(session.getAttribute("name")==null)
 	{
-		response.sendRedirect("login.jsp");
+		response.sendRedirect("loginClerk.jsp");
 	}
 %>
 
@@ -18,17 +18,13 @@
 
 <!------------------------------------------------------------------------------------------------------------------->
 <body>
-	<a href="modifyGuest.jsp">Modify Account?</a>
-	<h1>Welcome!</h1>
+	<a href="modifyClerk.jsp">Modify Account?</a>
+	<h1>Clerk dashboard</h1>
+	<a href="roomList.jsp">Access Room List</a>
+
 
 
 </body>
-
-
-
-
-
-
 
 
 

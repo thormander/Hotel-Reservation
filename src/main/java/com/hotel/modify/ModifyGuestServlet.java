@@ -1,4 +1,4 @@
-package com.hotel.registration;
+package com.hotel.modify;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
@@ -12,62 +12,50 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-
-@WebServlet("/register") //connection to the .jsp file for intake of data
-public class RegistrationServlet extends HttpServlet {
+@WebServlet("/modifyGuest") //connection to the .jsp file for intake of data
+public class ModifyGuestServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	
+       
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
-		String username = request.getParameter("name");
+		//REPLACING EMAIL WITH FIRST AND LAST NAME 
+		
 		String uemail = request.getParameter("email");
 		String upass = request.getParameter("pass");
-		
-		if (uemail == "") 
-		{
-			
-		}
+		String uname = request.getParameter("name");
+		String upassOld = request.getParameter("passOld");
 		
 		RequestDispatcher dispatcher = null;
 		Connection con = null;
+		
+		//"`"
 		
 		try 
 		{
 			Class.forName("com.mysql.cj.jdbc.Driver");
 			
 			//CONNECTION TO DB (change "hotel" to whatever you database name is.)
-			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false","root", "1234");
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?allowPublicKeyRetrieval=true&useSSL=false","root", "1234");
 			//SQL query to database here
-			PreparedStatement pst = con.prepareStatement("INSERT INTO account(user_name,email_id,password,type) values(?,?,?,'guest')");
-			pst.setString(1, username);
+			
+			PreparedStatement pst = con.prepareStatement("UPDATE `hotel`.`account` SET `password` = ? WHERE (`email_id` = ? AND `user_name` = ? AND `password` = ? AND `type` = 'guest')");
+			
+			pst.setString(1, upass);
 			pst.setString(2, uemail);
-			pst.setString(3, upass);
+			pst.setString(3, uname);
+			pst.setString(4, upassOld);
 			
-			int rowCount = pst.executeUpdate();
+			pst.executeUpdate();
 			
-			dispatcher = request.getRequestDispatcher("registration.jsp");
-			if (rowCount > 0)
-			{
-				request.setAttribute("status", "success");
-			}
-			else
-			{
-				request.setAttribute("status", "failed");
-			}
+			dispatcher = request.getRequestDispatcher("modifyGuest.jsp");
 			
 			dispatcher.forward(request, response);
-			
-		}
-		catch (java.sql.SQLIntegrityConstraintViolationException e)
-		{
-		    request.setAttribute("errorMessage", "Email already exists");
-		    request.setAttribute("showError", "true");
-		    request.getRequestDispatcher("/registration.jsp").forward(request, response);
-		}
+		
+		} 
 		catch (Exception e) 
 		{
 			e.printStackTrace();
-		}
+		} 
 		finally
 		{
 			try
