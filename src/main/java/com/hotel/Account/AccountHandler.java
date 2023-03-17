@@ -16,7 +16,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-import com.hotel.reservation.Room;
 
 /**
  * Servlet implementation class AccountHandler
@@ -27,7 +26,7 @@ public class AccountHandler extends HttpServlet {
        
     //doGet gets called 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
+		
 		String accountType = request.getParameter("accountType");
 		switch(accountType)
 		
@@ -68,8 +67,130 @@ public class AccountHandler extends HttpServlet {
 			break;	
 			
 		default:
-			System.out.print("accountHandler just got Called!");
+			System.out.print("nothing executed in accountHandler ! :(");
 			break;
+		}
+		
+	}
+
+	private void registerClerk(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String username = request.getParameter("name");
+		String uemail = request.getParameter("email");
+		String upass = request.getParameter("pass");
+		
+		RequestDispatcher dispatcher = null;
+		Connection con = null;
+		
+		try 
+		{
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			//CONNECTION TO DB (change "hotel" to whatever you database name is.)
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false","root", "1234");
+			//SQL query to database here. (PLEASE NAME YOUR DB TO hotel)
+			PreparedStatement pst = con.prepareStatement("INSERT INTO account(user_name,email_id,password,type) values(?,?,?,'clerk')");
+			pst.setString(1, username);
+			pst.setString(2, uemail);
+			pst.setString(3, upass);
+			
+			int rowCount = pst.executeUpdate();
+			
+			dispatcher = request.getRequestDispatcher("indexAdmin.jsp");
+			if (rowCount > 0)
+			{
+				request.setAttribute("status", "success");
+			}
+			else
+			{
+				request.setAttribute("status", "failed");
+			}
+			
+			dispatcher.forward(request, response);
+			
+		}
+		catch (java.sql.SQLIntegrityConstraintViolationException e)
+		{
+		    request.setAttribute("errorMessage", "Email already exists");
+		    request.setAttribute("showError", "true");
+		    request.getRequestDispatcher("/indexAdmin.jsp").forward(request, response);
+		}
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+		} 
+		finally
+		{
+			try
+			{
+				con.close();
+			}
+			catch (SQLException e)
+			{
+				e.printStackTrace();
+			}
+		}
+		
+	}
+
+	private void registerGuest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String username = request.getParameter("name");
+		String uemail = request.getParameter("email");
+		String upass = request.getParameter("pass");
+		
+		if (uemail == "") 
+		{
+			
+		}
+		
+		RequestDispatcher dispatcher = null;
+		Connection con = null;
+		
+		try 
+		{
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			
+			//CONNECTION TO DB (change "hotel" to whatever you database name is.)
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false","root", "1234");
+			//SQL query to database here
+			PreparedStatement pst = con.prepareStatement("INSERT INTO account(user_name,email_id,password,type) values(?,?,?,'guest')");
+			pst.setString(1, username);
+			pst.setString(2, uemail);
+			pst.setString(3, upass);
+			
+			int rowCount = pst.executeUpdate();
+			
+			dispatcher = request.getRequestDispatcher("registration.jsp");
+			if (rowCount > 0)
+			{
+				request.setAttribute("status", "success");
+			}
+			else
+			{
+				request.setAttribute("status", "failed");
+			}
+			
+			dispatcher.forward(request, response);
+			
+		}
+		catch (java.sql.SQLIntegrityConstraintViolationException e)
+		{
+		    request.setAttribute("errorMessage", "Email already exists");
+		    request.setAttribute("showError", "true");
+		    request.getRequestDispatcher("/registration.jsp").forward(request, response);
+		}
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			try
+			{
+				con.close();
+			}
+			catch (SQLException e)
+			{
+				e.printStackTrace();
+			}
 		}
 		
 	}

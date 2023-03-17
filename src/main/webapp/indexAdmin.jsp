@@ -49,8 +49,8 @@ function showErrorMessage() {
 					<div class="signup-form">
 						<h2 class="form-title">Clerk Account Creation</h2>
 
-						<form method="post" action="registerClerk" class="register-form"
-							id="register-form">
+						<form method="post" action="accountHandler" class="register-form" id="register-form">
+							<input type="hidden" name="accountType" value="registerClerk">
 							<div class="form-group">
 								<label for="name"><i
 									class="zmdi zmdi-account material-icons-name"></i></label> <input
