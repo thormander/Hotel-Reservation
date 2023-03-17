@@ -33,11 +33,13 @@ tr ]
 				<form method="post" action="reservationHandler">
 				
 					<div>
+						<h2>Start Date:</h2>
 						<label for="startDate"></label> <input
 							type="date" name="startDate" id="startDate" placeholder="Start Date" required="required"/>
 					</div>
 					
 					<div class="form-group">
+						<h2>End Date:</h2>
 						<label for="endDate"></label> <input
 							type="date" name="endDate" id="endDate" placeholder= "End Date" required="required"/>
 					</div>

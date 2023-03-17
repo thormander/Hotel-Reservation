@@ -11,17 +11,17 @@
 <body>
 
 <input type="hidden" id="status" value="<%= request.getAttribute("status") %>">
-
 	<div class="main">
-	<a href="index.jsp">Back to Main Login?</a>
+	<a href="login.jsp">Back to Main Login?</a>
 
-		<!-- Sing in  Form -->
+		<!-- Sign in  Form -->
 		<section class="sign-in">
 			<div class="container">
 				<div class="signin-content">
 					<div class="signin-form">
 						<h2 class="form-title">Clerk Sign in</h2>
-						<form method="post" action="loginClerk" class="register-form" id="login-form">
+						<form method="post" action="accountHandler" class="register-form" id="login-form">
+							<input type="hidden" name="accountType" value="clerk">
 							<div class="form-group">
 								<label for="username"><i
 									class="zmdi zmdi-account material-icons-name"></i></label> <input

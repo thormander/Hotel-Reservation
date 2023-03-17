@@ -71,7 +71,6 @@ public class ReservationHandler extends HttpServlet {
 				a.setId(rs.getInt("id"));
 				a.setamountBeds(rs.getString("amountBeds"));
 				a.setbedSize(rs.getString("bedSize"));
-				
 				a.setSmoking(rs.getString("smoking"));
 				a.setQuality(rs.getString("Quality"));
 				a.setroomInformation(rs.getString("roomInformation"));

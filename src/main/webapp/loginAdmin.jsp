@@ -19,7 +19,8 @@
 				<div class="signin-content">
 					<div class="signin-form">
 						<h2 class="form-title">Admin Sign in</h2>
-						<form method="post" action="loginAdmin" class="register-form" id="login-form">
+						<form method="post" action="accountHandler" class="register-form" id="login-form">
+							<input type="hidden" name="accountType" value="admin">
 							<div class="form-group">
 								<label for="username"><i
 									class="zmdi zmdi-account material-icons-name"></i></label> <input

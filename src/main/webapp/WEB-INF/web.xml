@@ -124,4 +124,14 @@
     <servlet-name>RoomHandler</servlet-name>
     <url-pattern>/RoomHandler</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>AccountHandler</display-name>
+    <servlet-name>AccountHandler</servlet-name>
+    <servlet-class>com.hotel.Account.AccountHandler</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>AccountHandler</servlet-name>
+    <url-pattern>/AccountHandler</url-pattern>
+  </servlet-mapping>
 </web-app>

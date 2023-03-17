@@ -12,13 +12,10 @@
 	<div>
 		<div>
 			<div>
-				<c:if test="${room != null}">
-					<form action="update" method="post">
-				</c:if>
-				<c:if test="${room == null}">
-					<form action="insert" method="post">
-				</c:if>
-
+				
+				<form action="update" method="post">
+				
+				
 
 				<c:if test="${room != null}">Edit Room</c:if>
 
