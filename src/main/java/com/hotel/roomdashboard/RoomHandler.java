@@ -103,7 +103,7 @@ public class RoomHandler extends HttpServlet {
 		Connection con = null;
 		
 		List<Room> myRooms = new ArrayList<>();
-		System.out.print("Executed searchAllRooms!");
+		System.out.println("Executed searchAllRooms!");
 		try 
 		{
 			Class.forName("com.mysql.cj.jdbc.Driver");

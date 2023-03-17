@@ -32,23 +32,146 @@ public class AccountHandler extends HttpServlet {
 		switch(accountType)
 		
 		{
-		case "guest":
-			System.out.print("here2");
+		case "guest": //login.jsp
+			System.out.println("login guest executed!");
 			GuestSignIn(request,response);
 			break;
 			
-		case "clerk":
+		case "clerk": //loginClerk.jsp
+			System.out.println("login clerk executed!");
 			ClerkSignIn(request,response);
 			break;
 		
-		case "admin":
+		case "admin": //loginAdmin.jsp
+			System.out.println("login admin executed!");
 			AdminSignIn(request,response);
+			break;
+		
+		case "modifyGuest": //modifyGuest.jsp
+			System.out.println("modify guest executed!");
+			modifyGuest(request,response);
+			break;
+		
+		case "modifyClerk": //modifyClerk.jsp
+			System.out.println("modify clerk executed!");
+			modifyClerk(request,response);
+			break;
+		
+		case "registerGuest": //registration.jsp
+			System.out.println("register guest executed!");
+			registerGuest(request,response);
+			break;
+		
+		case "registerClerk": //indexAdmin.jsp
+			System.out.println("register clerk executed!");
+			registerClerk(request,response);
+			break;	
 			
-			break;
-				
 		default:
-			System.out.print(":)");
+			System.out.print("accountHandler just got Called!");
 			break;
+		}
+		
+	}
+
+	private void modifyClerk(HttpServletRequest request, HttpServletResponse response) {
+		
+		String uemail = request.getParameter("email");
+		String upass = request.getParameter("pass");
+		String uname = request.getParameter("name");
+		String upassOld = request.getParameter("passOld");
+		
+		RequestDispatcher dispatcher = null;
+		Connection con = null;
+		
+		//"`"
+		
+		try 
+		{
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			
+			//CONNECTION TO DB (change "hotel" to whatever you database name is.)
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?allowPublicKeyRetrieval=true&useSSL=false","root", "1234");
+			//SQL query to database here
+			
+			PreparedStatement pst = con.prepareStatement("UPDATE `hotel`.`account` SET `password` = ? WHERE (`email_id` = ? AND `user_name` = ? AND `password` = ? AND `type` = 'clerk') ");
+			
+			pst.setString(1, upass);
+			pst.setString(2, uemail);
+			pst.setString(3, uname);
+			pst.setString(4, upassOld);
+			
+			pst.executeUpdate();
+			
+			dispatcher = request.getRequestDispatcher("modifyClerk.jsp");
+			
+			dispatcher.forward(request, response);
+		
+		} 
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+		} 
+		finally
+		{
+			try
+			{
+				con.close();
+			}
+			catch (SQLException e)
+			{
+				e.printStackTrace();
+			}
+		}
+		
+	}
+
+	private void modifyGuest(HttpServletRequest request, HttpServletResponse response) {
+		
+		String uemail = request.getParameter("email");
+		String upass = request.getParameter("pass");
+		String uname = request.getParameter("name");
+		String upassOld = request.getParameter("passOld");
+		
+		RequestDispatcher dispatcher = null;
+		Connection con = null;
+		
+		try 
+		{
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			
+			//CONNECTION TO DB (change "hotel" to whatever you database name is.)
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?allowPublicKeyRetrieval=true&useSSL=false","root", "1234");
+			//SQL query to database here
+			
+			PreparedStatement pst = con.prepareStatement("UPDATE `hotel`.`account` SET `password` = ? WHERE (`email_id` = ? AND `user_name` = ? AND `password` = ? AND `type` = 'guest')");
+			
+			pst.setString(1, upass);
+			pst.setString(2, uemail);
+			pst.setString(3, uname);
+			pst.setString(4, upassOld);
+			
+			pst.executeUpdate();
+			
+			dispatcher = request.getRequestDispatcher("modifyGuest.jsp");
+			
+			dispatcher.forward(request, response);
+		
+		} 
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+		} 
+		finally
+		{
+			try
+			{
+				con.close();
+			}
+			catch (SQLException e)
+			{
+				e.printStackTrace();
+			}
 		}
 		
 	}
@@ -179,3 +302,24 @@ public class AccountHandler extends HttpServlet {
 	}
 
 }
+
+
+/* this is the code that was on logout servlet(currently unused)
+ * public class logoutServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+    public logoutServlet() {
+        super();
+    }
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		response.getWriter().append("Served at: ").append(request.getContextPath());
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+		doGet(request, response);
+	}
+
+}
+ * */

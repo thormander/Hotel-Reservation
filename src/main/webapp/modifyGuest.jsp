@@ -26,7 +26,8 @@
 				<div class="signup-content">
 					<div class="signup-form">
 						<h2 class="form-title">Modify Account</h2>
-						<form method="post" action="modifyGuest">
+						<form method="post" action="accountHandler">
+						<input type="hidden" name="accountType" value="modifyGuest">
 							<div class="form-group">
 								<input type="text" name="name" id="nameFull" placeholder="Your Name" required="required"/>
 							</div>

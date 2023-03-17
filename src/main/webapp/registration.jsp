@@ -39,8 +39,7 @@ function showErrorMessage() {
 				<div class="signup-content">
 					<div class="signup-form">
 						<h2 class="form-title">Guest Account Creation</h2>
-						<form method="post" action="register" class="register-form"
-							id="register-form">
+						<form method="post" action="register" class="register-form" id="register-form">
 							<div class="form-group">
 								<label for="name"><i
 									class="zmdi zmdi-account material-icons-name"></i></label> <input
