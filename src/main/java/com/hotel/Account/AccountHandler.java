@@ -66,7 +66,7 @@ public class AccountHandler extends HttpServlet {
 			registerClerk(request,response);
 			break;	
 			
-		default:
+		default: //WE CAN PROBABLY USE THIS FOR THE LOGOUT METHOD!
 			System.out.print("nothing executed in accountHandler ! :(");
 			break;
 		}
