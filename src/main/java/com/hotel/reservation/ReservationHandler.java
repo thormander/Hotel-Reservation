@@ -16,6 +16,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+import java.sql.SQLException;
+
 
 
 
@@ -27,6 +29,15 @@ public class ReservationHandler extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		String reservationStep = request.getParameter("reservationStep");
+		String editButton = request.getParameter("editReservation");
+		String deleteButton = request.getParameter("deleteReservation");
+		String returnToMyReservations = request.getParameter("myReservations");
+		String submitReservationForm = request.getParameter("submitReservation");
+		
+		if (reservationStep == "" || reservationStep == null) {
+			reservationStep = determineReservationStep(editButton, deleteButton, returnToMyReservations, submitReservationForm);
+		}
+		
 		switch(reservationStep)
 		
 		{
@@ -38,6 +49,43 @@ public class ReservationHandler extends HttpServlet {
 		case "createReservation": //loginClerk.jsp
 			System.out.println("create reservation executed!");
 			CreateReservation(request,response);
+			break;
+		
+		case "editReservation": //loginClerk.jsp
+			System.out.println("edit reservation executed!");
+			viewReservationsForm(request, response, editButton);
+			break;
+			
+		case "deleteReservation": //loginClerk.jsp
+			System.out.println("delete reservation executed!");
+			deleteReservations(request, response, deleteButton);
+			break;
+			
+		case "submitReservationModify": //loginClerk.jsp
+			System.out.println("Modify reservation executed!");
+			
+			String startDate = request.getParameter("startDate");
+			String endDate = request.getParameter("endDate");
+			System.out.print("Start Date: ");
+			System.out.println(startDate);
+			System.out.print("End Date: ");
+			System.out.println(endDate);
+			
+			if (endDate == null || startDate == null || endDate == "" || startDate == "") {
+				handleBlankFields(request, response, submitReservationForm);
+			} else {
+				String dateValidation = validateDates(startDate, endDate);
+				if (dateValidation == "") {
+					submitReservationUpdates(request, response, submitReservationForm, startDate, endDate);
+				} else {
+					invalidDateRedirect(request, response, dateValidation, submitReservationForm);
+				}
+			}
+			break;
+			
+		case "returnToMyReservations": //loginClerk.jsp
+			System.out.println("Return to reservations executed!");
+			viewMyReservations(request, response);
 			break;
 			
 		default:
@@ -182,5 +230,214 @@ public class ReservationHandler extends HttpServlet {
 		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
+	
+	public void deleteReservations(HttpServletRequest request, HttpServletResponse response, String deleteParams) {
+		HttpSession session = request.getSession();
+		String currentUser = (String) session.getAttribute("email");
+		RequestDispatcher dispatcher = null;
+		
+		try 
+		{
+			int reservation_id =  Integer.parseInt(deleteParams);
 
+			Connection con = null;
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=America/Chicago","root", "1234");
+			
+			
+			PreparedStatement reservationDelete = con.prepareStatement("DELETE FROM reservation WHERE id = ?;");
+
+			
+			reservationDelete.setInt(1, reservation_id);
+			int rowsDeleted = reservationDelete.executeUpdate();
+			
+			viewMyReservations(request, response);
+			
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	public void viewMyReservations(HttpServletRequest request, HttpServletResponse response) {
+		HttpSession session = request.getSession();
+		String currentUser = (String) session.getAttribute("email");
+		RequestDispatcher dispatcher = null;
+		
+		try 
+		{
+		
+			List<Reservation> myReservations = getMyReservations(request, response, currentUser);
+			System.out.println(myReservations);
+
+			request.setAttribute("reservations", myReservations);
+			
+			dispatcher = request.getRequestDispatcher("viewReservations.jsp");
+			dispatcher.forward(request, response);
+			
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	public void viewReservationsForm(HttpServletRequest request, HttpServletResponse response, String editParams) {
+		HttpSession session = request.getSession();
+		String currentUser = (String) session.getAttribute("email");
+		RequestDispatcher dispatcher = null;
+		
+		try 
+		{
+			request.setAttribute("reservationId", editParams);
+			
+			dispatcher = request.getRequestDispatcher("reservationsForm.jsp");
+			dispatcher.forward(request, response);
+			
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	public void handleBlankFields(HttpServletRequest request, HttpServletResponse response, String submitReservationForm) {
+		
+		RequestDispatcher dispatcher = null;
+		
+		try 
+		{
+			request.setAttribute("warning", "One or more of your fields are blank, please be sure to set both dates.");
+			request.setAttribute("reservationId", submitReservationForm);
+			
+			dispatcher = request.getRequestDispatcher("reservationsForm.jsp");
+			dispatcher.forward(request, response);
+			
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	public void submitReservationUpdates(HttpServletRequest request, HttpServletResponse response, String submitReservationForm, String startDate, String endDate) {
+		HttpSession session = request.getSession();
+		String currentUser = (String) session.getAttribute("email");
+		RequestDispatcher dispatcher = null;
+		
+		try 
+		{
+			int reservation_id =  Integer.parseInt(submitReservationForm);
+
+			Connection con = null;
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=America/Chicago","root", "1234");
+			PreparedStatement currentReservations = con.prepareStatement("SELECT id FROM reservation WHERE id = ? AND startDate = ? AND endDate = ?;");
+			currentReservations.setInt(1, reservation_id);
+			currentReservations.setString(2, startDate);
+			currentReservations.setString(3, endDate);
+
+			ResultSet rs = currentReservations.executeQuery();
+			System.out.println(rs);
+			if (rs.next()) {
+				request.setAttribute("warning", "This room is already reserved for the dates you provided. Please try different dates.");
+				request.setAttribute("reservationId", submitReservationForm);
+				
+				dispatcher = request.getRequestDispatcher("reservationsForm.jsp");
+				dispatcher.forward(request, response);
+			} else {
+				PreparedStatement updateReservation = con.prepareStatement("UPDATE reservation SET startDate = ? , endDate = ? WHERE id = ?;");
+
+				
+				updateReservation.setString(1, startDate);
+				updateReservation.setString(2, endDate);
+				updateReservation.setInt(3, reservation_id);
+
+				int rowsUpdated = updateReservation.executeUpdate();
+
+				
+				viewMyReservations(request, response);
+			}
+			
+			
+			
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	public void invalidDateRedirect(HttpServletRequest request, HttpServletResponse response, String dateValidation, String submitReservationForm) {
+		RequestDispatcher dispatcher = null;
+
+		try {
+			request.setAttribute("warning", dateValidation);
+			request.setAttribute("reservationId", submitReservationForm);
+			
+			dispatcher = request.getRequestDispatcher("reservationsForm.jsp");
+			dispatcher.forward(request, response);
+		} catch (Exception e) {
+			
+		}
+	}
+	public List<Reservation> getMyReservations(HttpServletRequest request, HttpServletResponse response, String currentUser)
+	{
+		System.out.println(currentUser);
+		Connection con = null;
+		
+		List<Reservation> myReservations = new ArrayList<>();
+		try 
+		{
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			//CONNECTION TO DB (change "hotel" to whatever you database name is.)
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=America/Chicago","root", "1234");
+			
+			
+			PreparedStatement pst = con.prepareStatement("SELECT id, startDate, endDate, reservationName, accountType  FROM reservation WHERE reservationName = ?");
+
+			
+			pst.setString(1, currentUser);
+			ResultSet rs = pst.executeQuery();
+			
+			while(rs.next()) {
+				Reservation a = new Reservation();
+				a.setId(rs.getString("id"));
+				a.setStartDate(rs.getString("startDate"));
+				a.setEndDate(rs.getString("endDate"));
+				myReservations.add(a);
+			}
+			
+
+		} catch (SQLException | ClassNotFoundException e)
+		{  
+			e.printStackTrace();
+		}
+		
+		return myReservations;
+	}
+	
+	public String validateDates(String startDate, String endDate) {
+		String warning = "";
+		
+		int result = startDate.compareTo(endDate);
+		
+        if (result > 0) {
+			warning = "Please correct your dates, the start date you entered was after the end date you entered.";
+        } 
+
+		return warning;
+	}
+
+	public String determineReservationStep(String editButton, String deleteButton, String returnToMyReservations, String submitReservationForm) {
+		String reservationStep = "";
+		
+		if (editButton != null) {
+			reservationStep = "editReservation";
+		} else if (deleteButton != null) {
+			reservationStep = "deleteReservation";
+		} else if (returnToMyReservations != null) {
+			reservationStep = "returnToMyReservations";
+
+		} else if (submitReservationForm != null) {
+			reservationStep = "submitReservationModify";
+		}
+		return reservationStep;
+	}
 }

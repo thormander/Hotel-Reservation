@@ -134,4 +134,14 @@
     <servlet-name>AccountHandler</servlet-name>
     <url-pattern>/AccountHandler</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>GetReservations</display-name>
+    <servlet-name>GetReservations</servlet-name>
+    <servlet-class>com.hotel.reservation.GetReservations</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>GetReservations</servlet-name>
+    <url-pattern>/GetReservations</url-pattern>
+  </servlet-mapping>
 </web-app>

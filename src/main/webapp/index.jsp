@@ -18,8 +18,10 @@
 
 <!------------------------------------------------------------------------------------------------------------------->
 <body>
-	<a href="modifyGuest.jsp">Modify Account?</a>
-
+	<a href="modifyGuest.jsp">Modify Account?</a><br/>
+<form action="getReservations" method="post">
+		<button type="submit" value="${sessionScope.email}">My Reservations</button>
+	</form>
 	
 	<h1>Welcome!</h1>
 
