@@ -67,10 +67,20 @@ public class AccountHandler extends HttpServlet {
 			break;	
 			
 		default: //WE CAN PROBABLY USE THIS FOR THE LOGOUT METHOD!
-			System.out.print("nothing executed in accountHandler ! :(");
+			System.out.print("logout executed!");
+			logout(request,response);
 			break;
 		}
 		
+	}
+
+	private void logout(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		HttpSession session = request.getSession(false);
+		if(session != null)
+		{
+		    session.invalidate();
+		}
+		request.getRequestDispatcher("/login.jsp").forward(request,response);
 	}
 
 	private void registerClerk(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -85,7 +95,7 @@ public class AccountHandler extends HttpServlet {
 		{
 			Class.forName("com.mysql.cj.jdbc.Driver");
 			//CONNECTION TO DB (change "hotel" to whatever you database name is.)
-			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false","root", "1234");
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=UTC","root", "1234");
 			//SQL query to database here. (PLEASE NAME YOUR DB TO hotel)
 			PreparedStatement pst = con.prepareStatement("INSERT INTO account(user_name,email_id,password,type) values(?,?,?,'clerk')");
 			pst.setString(1, username);
@@ -149,7 +159,7 @@ public class AccountHandler extends HttpServlet {
 			Class.forName("com.mysql.cj.jdbc.Driver");
 			
 			//CONNECTION TO DB (change "hotel" to whatever you database name is.)
-			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false","root", "1234");
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=UTC","root", "1234");
 			//SQL query to database here
 			PreparedStatement pst = con.prepareStatement("INSERT INTO account(user_name,email_id,password,type) values(?,?,?,'guest')");
 			pst.setString(1, username);
@@ -212,7 +222,7 @@ public class AccountHandler extends HttpServlet {
 			Class.forName("com.mysql.cj.jdbc.Driver");
 			
 			//CONNECTION TO DB (change "hotel" to whatever you database name is.)
-			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?allowPublicKeyRetrieval=true&useSSL=false","root", "1234");
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC","root", "1234");
 			//SQL query to database here
 			
 			PreparedStatement pst = con.prepareStatement("UPDATE `hotel`.`account` SET `password` = ? WHERE (`email_id` = ? AND `user_name` = ? AND `password` = ? AND `type` = 'clerk') ");
@@ -262,7 +272,7 @@ public class AccountHandler extends HttpServlet {
 			Class.forName("com.mysql.cj.jdbc.Driver");
 			
 			//CONNECTION TO DB (change "hotel" to whatever you database name is.)
-			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?allowPublicKeyRetrieval=true&useSSL=false","root", "1234");
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC","root", "1234");
 			//SQL query to database here
 			
 			PreparedStatement pst = con.prepareStatement("UPDATE `hotel`.`account` SET `password` = ? WHERE (`email_id` = ? AND `user_name` = ? AND `password` = ? AND `type` = 'guest')");
@@ -309,7 +319,7 @@ public class AccountHandler extends HttpServlet {
 		{
 			Class.forName("com.mysql.cj.jdbc.Driver");
 			//CONNECTION TO DB (change "hotel" to whatever you database name is.)
-			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false","root", "1234");
+			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=UTC","root", "1234");
 			//SQL query to database here. (PLEASE NAME YOUR DB TO hotel)
 			PreparedStatement pst = con.prepareStatement("SELECT * FROM account WHERE email_id = ? AND password = ? AND type = 'admin'");
 			
@@ -320,6 +330,10 @@ public class AccountHandler extends HttpServlet {
 			if (rs.next())
 			{
 				session.setAttribute("name", rs.getString("user_name"));
+				// TEST
+				session.setAttribute("email", rs.getString("email_id"));
+				session.setAttribute("type", rs.getString("type"));
+				// TEST
 				dispatcher = request.getRequestDispatcher("indexAdmin.jsp");
 			}
 			else
@@ -348,7 +362,7 @@ public class AccountHandler extends HttpServlet {
 		{
 			Class.forName("com.mysql.cj.jdbc.Driver");
 			//CONNECTION TO DB (change "hotel" to whatever you database name is.)
-			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false","root", "1234");
+			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=UTC","root", "1234");
 			//SQL query to database here. (PLEASE NAME YOUR DB TO hotel)
 			PreparedStatement pst = con.prepareStatement("SELECT * FROM account WHERE email_id = ? AND password = ? AND type = 'clerk'");
 			
@@ -359,6 +373,10 @@ public class AccountHandler extends HttpServlet {
 			if (rs.next())
 			{
 				session.setAttribute("name", rs.getString("user_name"));
+				// Needed for Reservation Handler
+				session.setAttribute("email", rs.getString("email_id"));
+				session.setAttribute("type", rs.getString("type"));
+				// Needed for Reservation Handler
 				dispatcher = request.getRequestDispatcher("indexClerk.jsp");
 			}
 			else
@@ -395,7 +413,7 @@ public class AccountHandler extends HttpServlet {
 		{
 			Class.forName("com.mysql.cj.jdbc.Driver");
 			//CONNECTION TO DB (change "hotel" to whatever you database name is.)
-			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false","root", "1234");
+			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=UTC","root", "1234");
 			//SQL query to database here. (PLEASE NAME YOUR DB TO hotel)
 			PreparedStatement pst = con.prepareStatement("SELECT * FROM account WHERE email_id = ? AND password = ? AND type = 'guest'");
 			
@@ -406,6 +424,10 @@ public class AccountHandler extends HttpServlet {
 			if (rs.next())
 			{
 				session.setAttribute("name", rs.getString("user_name"));
+				// TEST
+				session.setAttribute("email", rs.getString("email_id"));
+				session.setAttribute("type", rs.getString("type"));
+				// TEST
 				dispatcher = request.getRequestDispatcher("index.jsp");
 			}
 			else

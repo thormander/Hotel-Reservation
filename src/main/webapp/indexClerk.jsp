@@ -23,7 +23,10 @@
 	<a href="roomList.jsp">Access Room List</a>
 
 
-
+	<form action="accountHandler" method="post">
+		<input type="hidden" name="accountType" value="logout">
+  		<button type="submit">Logout</button>
+	</form>
 </body>
 
 

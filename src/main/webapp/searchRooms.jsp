@@ -31,6 +31,7 @@ tr ]
 		<div>
 			<div>
 				<form method="post" action="reservationHandler">
+					<input type="hidden" name="reservationStep" value="startReservation">
 				
 					<div>
 						<h2>Start Date:</h2>

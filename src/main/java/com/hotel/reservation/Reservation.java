@@ -1,33 +1,53 @@
 package com.hotel.reservation;
+import java.util.*;
 
-import jakarta.servlet.RequestDispatcher;
+public class Reservation{
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+    private String id;
+    private String startDate;
+    private String endDate;
+    private String reservationName;
+    private String accountType;
+    
+    public String getId() {
+        return id;
+    }
 
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+    public void setId(String id) {
+        this.id = id;
+    }
+    
+    public String getStartDate() {
+        return startDate;
+    }
+    
+    public void setStartDate(String startDate) {
+    	this.startDate = startDate;
+    }
+    
+    public String getEndDate() {
+        return endDate;
+    }
 
+    public void setEndDate(String endDate) {
+        this.endDate = endDate;
+    }
+    
+    public String getReservationName() {
+        return reservationName;
+    }
 
+    public void setReservationName(String reservationName) {
+        this.reservationName = reservationName;
+    }
+    
+    public String getAccountType() {
+        return accountType;
+    }
+    public void setAccountType(String accountType) {
+        this.accountType = accountType;
+    }
 
-
-///////////////////////////////////
-@WebServlet("/reservation") //connection to the .jsp file f	or intake of data
-public class Reservation extends HttpServlet {
-	
-	private static final long serialVersionUID = 1L;
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		RequestDispatcher dispatcher = null;
-		dispatcher = request.getRequestDispatcher("reservationConfirmation.jsp");
-		dispatcher.forward(request, response);
-	}
-	
+    
+    public Reservation() {}
 }

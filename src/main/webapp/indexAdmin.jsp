@@ -72,5 +72,9 @@ function showErrorMessage() {
 				</div>
 			</div>
 		</section>
+	<form action="accountHandler" method="post">
+		<input type="hidden" name="accountType" value="logout">
+  		<button type="submit">Logout</button>
+	</form>
 </body>
 </html>

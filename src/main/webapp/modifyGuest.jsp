@@ -47,7 +47,7 @@
 						</form>
 					</div>
 					<div>
-						<a href="indexClerk.jsp">Back to dashboard?</a>
+						<a href="index.jsp">Back to dashboard?</a>
 					</div>
 				</div>
 			</div>

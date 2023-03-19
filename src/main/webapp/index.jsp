@@ -19,9 +19,14 @@
 <!------------------------------------------------------------------------------------------------------------------->
 <body>
 	<a href="modifyGuest.jsp">Modify Account?</a>
+
+	
 	<h1>Welcome!</h1>
 
-
+	<form action="accountHandler" method="post">
+		<input type="hidden" name="accountType" value="logout">
+  		<button type="submit">Logout</button>
+	</form>
 </body>
 
 
