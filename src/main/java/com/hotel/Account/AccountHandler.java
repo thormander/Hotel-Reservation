@@ -219,7 +219,7 @@ public class AccountHandler extends HttpServlet {
 	/* modifyClerk:
 	 * 	This function updates the password for an existing clerk account in the database.
 	 * */
-	private void modifyClerk(HttpServletRequest request, HttpServletResponse response) {
+	public void modifyClerk(HttpServletRequest request, HttpServletResponse response) {
 		
 		String uemail = request.getParameter("email");
 		String upass = request.getParameter("pass");
@@ -248,6 +248,8 @@ public class AccountHandler extends HttpServlet {
 			
 			pst.executeUpdate();
 			
+			request.setAttribute("status", "success"); //for unit testing
+			
 			dispatcher = request.getRequestDispatcher("modifyClerk.jsp");
 			
 			dispatcher.forward(request, response);
@@ -274,7 +276,7 @@ public class AccountHandler extends HttpServlet {
 	/* modifyGuest:
 	 *	This function updates the password for an existing guest account in the database.
 	 * */
-	private void modifyGuest(HttpServletRequest request, HttpServletResponse response) {
+	public void modifyGuest(HttpServletRequest request, HttpServletResponse response) {
 		
 		String uemail = request.getParameter("email");
 		String upass = request.getParameter("pass");
@@ -300,6 +302,8 @@ public class AccountHandler extends HttpServlet {
 			pst.setString(4, upassOld);
 			
 			pst.executeUpdate();
+			
+			request.setAttribute("status", "success"); //for unit testing
 			
 			dispatcher = request.getRequestDispatcher("modifyGuest.jsp");
 			

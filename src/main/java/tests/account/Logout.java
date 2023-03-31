@@ -35,3 +35,7 @@ class Logout {
     }
 
 }
+
+/* ON SUCCESS: this means test case received the 'success' from the method for a normal execution of the function (and there is currently a session)
+ * ON FAIL: means the logout credential did not have a valid session
+ * */
