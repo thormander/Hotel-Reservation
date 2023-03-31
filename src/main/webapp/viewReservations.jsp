@@ -25,18 +25,22 @@
 			<table border = "1">
 				<thead>
 					<tr>
+					<th>Room ID</th>
 						<th>Start Date</th>
 						<th>End Date</th>
+						<th>Room Information</th>
 					</tr>
 				</thead>
 				<tbody>
 						<c:forEach var="reservation" items="${requestScope.reservations}">
 						<tr>
+							<td><c:out value="${reservation.roomId}"/></td>
 							<td><c:out value="${reservation.startDate}"/></td>
 							<td><c:out value="${reservation.endDate}" /></td>
+							<td><c:out value="${reservation.roomInformation}" /></td>
 							<form action=reservationHandler method="post">
 							<td>
-							<button type="submit" name="editReservation" value="${reservation.id}">Modify</button></td>
+							<button type="submit" name="editReservation" value="${reservation.roomId}-${reservation.id}">Modify</button></td>
 							</form>
 							<form action="reservationHandler" method="post">
 							<td><button type="submit" name="deleteReservation" value="${reservation.id}">Delete</button></td>

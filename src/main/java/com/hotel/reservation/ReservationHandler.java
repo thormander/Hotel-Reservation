@@ -53,12 +53,16 @@ public class ReservationHandler extends HttpServlet {
 		
 		case "editReservation": //loginClerk.jsp
 			System.out.println("edit reservation executed!");
-			viewReservationsForm(request, response, editButton);
+			viewMyReservations(request, response, editButton);
 			break;
 			
 		case "deleteReservation": //loginClerk.jsp
 			System.out.println("delete reservation executed!");
 			deleteReservations(request, response, deleteButton);
+			break;
+		case "getReservations" : //index.jsp
+			System.out.println("getReservation executed!");
+			viewMyReservations(request, response);
 			break;
 			
 		case "submitReservationModify": //loginClerk.jsp
@@ -104,74 +108,87 @@ public class ReservationHandler extends HttpServlet {
 		String bType = request.getParameter("bedType");
 		String quality = request.getParameter("quality");
 		
+		String dates = validateDates(startDate,endDate);
+		
+		
+		
 		HttpSession session = request.getSession();
 		RequestDispatcher dispatcher = null;
 		
-		try 
-		{
-			Class.forName("com.mysql.cj.jdbc.Driver");
-			//CONNECTION TO DB (change "hotel" to whatever you database name is.)
-			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=UTC","root", "1234");
-			//SQL query to database here. (PLEASE NAME YOUR DB TO hotel)
-			
-			//Call the reservation Catalog and room catalog.
-			PreparedStatement pst = con.prepareStatement("Select * from rooms where rooms.id NOT IN (SELECT reservation.id FROM reservation WHERE ((? >= startDate AND ? <= endDate) OR  (? >= startDate AND ? <= endDate))) AND smoking = ? AND bedSize = ? AND amountBeds = ? AND Quality = ?");
-			
-			// Old Statement
-			//(? > startDate AND ? < endDate) OR  (? > startDate AND ? < endDate) OR (?< startDate AND ? >endDate)
-			
-			// Conflicting Dates
-			
-			// Start date is within another reservation
-			// ? >= startDate where ? is new startDate
-			// ? <= endDate where ? is new startDate
-			
-			// End date is within another reservation
-			// ? >= startDate where ? is new endDate
-			// ? <= endDate where ? is new endDate
-			
-			//from there, we interact with the reservation class itself.
-			pst.setString(1,startDate);
-			pst.setString(2,startDate);
-			pst.setString(3,endDate);
-			pst.setString(4,endDate);
-			
-			pst.setString(5,smoking);
-			pst.setString(6,bType);
-			pst.setString(7,bAmount);
-			pst.setString(8,quality);
-			
-		
-			
-			
-			ResultSet rs = pst.executeQuery();
-			ArrayList<Room> myList = new ArrayList();
-			
-			while(rs.next()) {
-				Room a = new Room();
-				a.setId(rs.getInt("id"));
-				a.setamountBeds(rs.getString("amountBeds"));
-				a.setbedSize(rs.getString("bedSize"));
-				a.setSmoking(rs.getString("smoking"));
-				a.setQuality(rs.getString("Quality"));
-				a.setroomInformation(rs.getString("roomInformation"));
-				myList.add(a);
-				
-			}
-			
-			// Needed for Create Reservation
-			session.setAttribute("startDate", startDate);
-			session.setAttribute("endDate", endDate);
-			
-			request.setAttribute("rs", myList);
-			
-			dispatcher = request.getRequestDispatcher("availableRoomList.jsp");
+		if (dates == "" ) {
 
-			dispatcher.forward(request, response);
+			try 
+			{
+				Class.forName("com.mysql.cj.jdbc.Driver");
+				//CONNECTION TO DB (change "hotel" to whatever you database name is.)
+				Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=UTC","root", "1234");
+				//SQL query to database here. (PLEASE NAME YOUR DB TO hotel)
+				
+				//Call the reservation Catalog and room catalog.
+				PreparedStatement pst = con.prepareStatement("Select * from rooms where rooms.id NOT IN (SELECT reservation.id FROM reservation WHERE ((? >= startDate AND ? <= endDate) OR  (? >= startDate AND ? <= endDate) OR (? <= startDate AND ? >= endDate))) AND smoking = ? AND bedSize = ? AND amountBeds = ? AND Quality = ?");
+				
+				// Old Statement
+				//(? > startDate AND ? < endDate) OR  (? > startDate AND ? < endDate) OR (?< startDate AND ? >endDate)
+				
+				// Conflicting Dates
+				
+				// Start date is within another reservation
+				// ? >= startDate where ? is new startDate
+				// ? <= endDate where ? is new startDate
+				
+				// End date is within another reservation
+				// ? >= startDate where ? is new endDate
+				// ? <= endDate where ? is new endDate
+				
+				//from there, we interact with the reservation class itself.
+				pst.setString(1,startDate);
+				pst.setString(2,startDate);
+				pst.setString(3,endDate);
+				pst.setString(4,endDate);
+				pst.setString(5,startDate);
+				pst.setString(6,endDate);
+				pst.setString(7,smoking);
+				pst.setString(8,bType);
+				pst.setString(9,bAmount);
+				pst.setString(10,quality);
+				
 			
-		} catch (Exception e)
-		{
-			e.printStackTrace();
+				
+				
+				ResultSet rs = pst.executeQuery();
+				ArrayList<Room> myList = new ArrayList();
+				
+				while(rs.next()) {
+					Room a = new Room();
+					a.setId(rs.getInt("id"));
+					a.setamountBeds(rs.getString("amountBeds"));
+					a.setbedSize(rs.getString("bedSize"));
+					a.setSmoking(rs.getString("smoking"));
+					a.setQuality(rs.getString("Quality"));
+					a.setroomInformation(rs.getString("roomInformation"));
+					myList.add(a);
+					
+				}
+				
+				// Needed for Create Reservation
+				session.setAttribute("startDate", startDate);
+				session.setAttribute("endDate", endDate);
+				
+				request.setAttribute("rs", myList);
+				
+				dispatcher = request.getRequestDispatcher("availableRoomList.jsp");
+	
+				dispatcher.forward(request, response);
+				
+			} catch (Exception e)
+			{
+				e.printStackTrace();
+			}
+		} else {
+			request.setAttribute("warning", dates);
+
+            dispatcher = request.getRequestDispatcher("searchRooms.jsp");
+            dispatcher.forward(request, response);
 		}
 	}
 	
@@ -235,7 +252,6 @@ public class ReservationHandler extends HttpServlet {
 		HttpSession session = request.getSession();
 		String currentUser = (String) session.getAttribute("email");
 		RequestDispatcher dispatcher = null;
-		
 		try 
 		{
 			int reservation_id =  Integer.parseInt(deleteParams);
@@ -245,9 +261,8 @@ public class ReservationHandler extends HttpServlet {
 			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=America/Chicago","root", "1234");
 			
 			
-			PreparedStatement reservationDelete = con.prepareStatement("DELETE FROM reservation WHERE id = ?;");
+			PreparedStatement reservationDelete = con.prepareStatement("DELETE FROM reservation WHERE reservationID = ?;");
 
-			
 			reservationDelete.setInt(1, reservation_id);
 			int rowsDeleted = reservationDelete.executeUpdate();
 			
@@ -281,7 +296,7 @@ public class ReservationHandler extends HttpServlet {
 		}
 	}
 
-	public void viewReservationsForm(HttpServletRequest request, HttpServletResponse response, String editParams) {
+	public void viewMyReservations(HttpServletRequest request, HttpServletResponse response, String editParams) {
 		HttpSession session = request.getSession();
 		String currentUser = (String) session.getAttribute("email");
 		RequestDispatcher dispatcher = null;
@@ -302,11 +317,15 @@ public class ReservationHandler extends HttpServlet {
 	public void handleBlankFields(HttpServletRequest request, HttpServletResponse response, String submitReservationForm) {
 		
 		RequestDispatcher dispatcher = null;
-		
+		String[] submitReservationParams = submitReservationForm.split("-");
+
 		try 
 		{
+			String reservation_id =  submitReservationParams[1];
+			String room_id = submitReservationParams[0];
+			
 			request.setAttribute("warning", "One or more of your fields are blank, please be sure to set both dates.");
-			request.setAttribute("reservationId", submitReservationForm);
+			request.setAttribute("reservationId", reservation_id);
 			
 			dispatcher = request.getRequestDispatcher("reservationsForm.jsp");
 			dispatcher.forward(request, response);
@@ -321,18 +340,26 @@ public class ReservationHandler extends HttpServlet {
 		HttpSession session = request.getSession();
 		String currentUser = (String) session.getAttribute("email");
 		RequestDispatcher dispatcher = null;
+		String[] submitReservationParams = submitReservationForm.split("-");
 		
 		try 
 		{
-			int reservation_id =  Integer.parseInt(submitReservationForm);
+			
+			int reservation_id =  Integer.parseInt(submitReservationParams[1]);
+			int room_id = Integer.parseInt(submitReservationParams[0]);
 
 			Connection con = null;
 			Class.forName("com.mysql.cj.jdbc.Driver");
 			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=America/Chicago","root", "1234");
-			PreparedStatement currentReservations = con.prepareStatement("SELECT id FROM reservation WHERE id = ? AND startDate = ? AND endDate = ?;");
-			currentReservations.setInt(1, reservation_id);
-			currentReservations.setString(2, startDate);
-			currentReservations.setString(3, endDate);
+			PreparedStatement currentReservations = con.prepareStatement("SELECT reservationId FROM reservation WHERE id = ? AND reservationName != ? AND ((? >= startDate AND ? <= endDate) OR  (? >= startDate AND ? <= endDate) OR (? <= startDate AND ? >= endDate));");
+			currentReservations.setInt(1, room_id);
+			currentReservations.setString(2, currentUser);
+			currentReservations.setString(3,startDate);
+			currentReservations.setString(4,startDate);
+			currentReservations.setString(5,endDate);
+			currentReservations.setString(6,endDate);
+			currentReservations.setString(7,startDate);
+			currentReservations.setString(8,endDate);
 
 			ResultSet rs = currentReservations.executeQuery();
 			System.out.println(rs);
@@ -343,7 +370,7 @@ public class ReservationHandler extends HttpServlet {
 				dispatcher = request.getRequestDispatcher("reservationsForm.jsp");
 				dispatcher.forward(request, response);
 			} else {
-				PreparedStatement updateReservation = con.prepareStatement("UPDATE reservation SET startDate = ? , endDate = ? WHERE id = ?;");
+				PreparedStatement updateReservation = con.prepareStatement("UPDATE reservation SET startDate = ? , endDate = ? WHERE reservationId = ?;");
 
 				
 				updateReservation.setString(1, startDate);
@@ -390,7 +417,7 @@ public class ReservationHandler extends HttpServlet {
 			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=America/Chicago","root", "1234");
 			
 			
-			PreparedStatement pst = con.prepareStatement("SELECT id, startDate, endDate, reservationName, accountType  FROM reservation WHERE reservationName = ?");
+			PreparedStatement pst = con.prepareStatement("SELECT reservationID, reservation.id AS 'roomID', rooms.roomInformation AS 'roomInformation', startDate, endDate, reservationName FROM reservation RIGHT JOIN rooms ON reservation.id = rooms.id WHERE reservationName = ?;");
 
 			
 			pst.setString(1, currentUser);
@@ -398,7 +425,9 @@ public class ReservationHandler extends HttpServlet {
 			
 			while(rs.next()) {
 				Reservation a = new Reservation();
-				a.setId(rs.getString("id"));
+				a.setId(rs.getString("reservationID"));
+				a.setRoomId(rs.getString("roomID"));
+				a.setRoomInformation(rs.getString("roomInformation"));
 				a.setStartDate(rs.getString("startDate"));
 				a.setEndDate(rs.getString("endDate"));
 				myReservations.add(a);
@@ -440,4 +469,6 @@ public class ReservationHandler extends HttpServlet {
 		}
 		return reservationStep;
 	}
+	
+	
 }

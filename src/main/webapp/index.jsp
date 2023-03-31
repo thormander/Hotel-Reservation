@@ -18,12 +18,14 @@
 
 <!------------------------------------------------------------------------------------------------------------------->
 <body>
+	<h1>Welcome!</h1>
+
 	<a href="modifyGuest.jsp">Modify Account?</a><br/>
-<form action="getReservations" method="post">
+	<a href="searchRooms.jsp">Search Rooms?</a><br/>
+	<form action="reservationHandler" method="post">
+		<input type="hidden" name="reservationStep" value="getReservations">
 		<button type="submit" value="${sessionScope.email}">My Reservations</button>
 	</form>
-	
-	<h1>Welcome!</h1>
 
 	<form action="accountHandler" method="post">
 		<input type="hidden" name="accountType" value="logout">

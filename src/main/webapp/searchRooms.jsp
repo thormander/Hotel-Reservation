@@ -3,7 +3,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/sql" prefix="sql" %>
 
-
 <html>
 <head>
 <title>Create Reservation</title>
@@ -22,7 +21,6 @@ tr ]
 </head>
 <body>
 
-
 	<header>
 			<h1>Input Reservation Characteristics:</h1>
 	</header>
@@ -32,7 +30,15 @@ tr ]
 			<div>
 				<form method="post" action="reservationHandler">
 					<input type="hidden" name="reservationStep" value="startReservation">
-				
+					<%
+						  String warning = (String) request.getAttribute("warning");						 
+						  if (warning == null || warning == "") {%>
+						    <p><b></b></p>
+						   <%
+						  } else {%>
+							  <p><b><%= warning %></b></p>
+						 <% }
+					%>
 					<div>
 						<h2>Start Date:</h2>
 						<label for="startDate"></label> <input
@@ -91,6 +97,7 @@ tr ]
 				</form>
 			</div>
 		</div>
+		<a href="index.jsp">Go back to dashboard</a>
 	</div>
 </body>
 </html>

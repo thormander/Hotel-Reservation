@@ -57,6 +57,7 @@
 			</table>
 			
 		</form>
+		<a href="searchRooms.jsp">Go back to search?</a>
 </body>
 
 
