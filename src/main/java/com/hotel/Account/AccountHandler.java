@@ -14,19 +14,19 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
 
-
-/**
+/*
  * Servlet implementation class AccountHandler
  */
 @WebServlet("/accountHandler")
 public class AccountHandler extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
-    //doGet gets called 
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
+    
+	//doGet gets called 
+	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	
+		//CHANGED doGet to PUBLIC as test classes needs to see it
+	
 		String accountType = request.getParameter("accountType");
 		switch(accountType)
 		
@@ -66,24 +66,37 @@ public class AccountHandler extends HttpServlet {
 			registerClerk(request,response);
 			break;	
 			
-		default: //WE CAN PROBABLY USE THIS FOR THE LOGOUT METHOD!
+		default: //default to logout (Can change to a switch case if needed)
 			System.out.print("logout executed!");
 			logout(request,response);
 			break;
 		}
 		
 	}
+	
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		doGet(request, response); //just pass to doGet...(for account handler, does not make a difference to use one or the other)
+	}
 
-	private void logout(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	/*logout:
+	 *	This function logs out the user by invalidating the session and redirecting to the login page.
+	 * */
+	public void logout(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		HttpSession session = request.getSession(false);
 		if(session != null)
 		{
 		    session.invalidate();
+		    request.setAttribute("status", "success"); //for unit testing
 		}
 		request.getRequestDispatcher("/login.jsp").forward(request,response);
+		
+		
 	}
 
-	private void registerClerk(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	/*registerClerk:
+	 *	This function registers a new clerk account by inserting the user's information into the database.
+	 * */
+	public void registerClerk(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String username = request.getParameter("name");
 		String uemail = request.getParameter("email");
 		String upass = request.getParameter("pass");
@@ -140,16 +153,14 @@ public class AccountHandler extends HttpServlet {
 		}
 		
 	}
-
-	private void registerGuest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	
+	/* registerGuest:
+	 * 	This function registers a new guest account by inserting the user's information into the database.
+	 * */
+	public void registerGuest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException { //changed to public for junit testing
 		String username = request.getParameter("name");
 		String uemail = request.getParameter("email");
 		String upass = request.getParameter("pass");
-		
-		if (uemail == "") 
-		{
-			
-		}
 		
 		RequestDispatcher dispatcher = null;
 		Connection con = null;
@@ -205,6 +216,9 @@ public class AccountHandler extends HttpServlet {
 		
 	}
 
+	/* modifyClerk:
+	 * 	This function updates the password for an existing clerk account in the database.
+	 * */
 	private void modifyClerk(HttpServletRequest request, HttpServletResponse response) {
 		
 		String uemail = request.getParameter("email");
@@ -257,6 +271,9 @@ public class AccountHandler extends HttpServlet {
 		
 	}
 
+	/* modifyGuest:
+	 *	This function updates the password for an existing guest account in the database.
+	 * */
 	private void modifyGuest(HttpServletRequest request, HttpServletResponse response) {
 		
 		String uemail = request.getParameter("email");
@@ -307,7 +324,10 @@ public class AccountHandler extends HttpServlet {
 		
 	}
 
-	private void AdminSignIn(HttpServletRequest request, HttpServletResponse response) {
+	/*AdminSignIn:
+	 * 	This function handles the login process for an admin account. It verifies the user's credentials and redirects to the admin index.
+	 * */
+	public void AdminSignIn(HttpServletRequest request, HttpServletResponse response) {
 
 		String uemail = request.getParameter("username");
 		String upass = request.getParameter("password");
@@ -329,11 +349,11 @@ public class AccountHandler extends HttpServlet {
 			ResultSet rs = pst.executeQuery();
 			if (rs.next())
 			{
+				request.setAttribute("status", "success"); //used for unit test to ensure it passed query
+				
 				session.setAttribute("name", rs.getString("user_name"));
-				// TEST
 				session.setAttribute("email", rs.getString("email_id"));
 				session.setAttribute("type", rs.getString("type"));
-				// TEST
 				dispatcher = request.getRequestDispatcher("indexAdmin.jsp");
 			}
 			else
@@ -351,7 +371,10 @@ public class AccountHandler extends HttpServlet {
 		
 	}
 
-	private void ClerkSignIn(HttpServletRequest request, HttpServletResponse response) {
+	/*ClerkSignIn:
+	 *	This function handles the login process for a clerk account. It verifies the user's credentials against the database and redirects to the clerk index.
+	 * */
+	public void ClerkSignIn(HttpServletRequest request, HttpServletResponse response) {
 		String uemail = request.getParameter("username");
 		String upass = request.getParameter("password");
 		
@@ -372,11 +395,12 @@ public class AccountHandler extends HttpServlet {
 			ResultSet rs = pst.executeQuery();
 			if (rs.next())
 			{
+				request.setAttribute("status", "success"); //used for unit test to ensure it passed query
+				
 				session.setAttribute("name", rs.getString("user_name"));
-				// Needed for Reservation Handler
 				session.setAttribute("email", rs.getString("email_id"));
 				session.setAttribute("type", rs.getString("type"));
-				// Needed for Reservation Handler
+				
 				dispatcher = request.getRequestDispatcher("indexClerk.jsp");
 			}
 			else
@@ -393,16 +417,10 @@ public class AccountHandler extends HttpServlet {
 		}
 		
 	}
-
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	
+	/* GuestSignIn:
+	 * 	 This function handles the login process for a guest account. It verifies the user's credentials against the database and redirects to the guest index.
 	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		doGet(request, response);
-	}
-	
-	
 	public void GuestSignIn(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {		String uemail = request.getParameter("username");
 		String upass = request.getParameter("password");
 		
@@ -423,11 +441,11 @@ public class AccountHandler extends HttpServlet {
 			ResultSet rs = pst.executeQuery();
 			if (rs.next())
 			{
+				request.setAttribute("status", "success"); //used for unit test to ensure it passed query
+				
 				session.setAttribute("name", rs.getString("user_name"));
-				// TEST
 				session.setAttribute("email", rs.getString("email_id"));
 				session.setAttribute("type", rs.getString("type"));
-				// TEST
 				dispatcher = request.getRequestDispatcher("index.jsp");
 			}
 			else
@@ -445,24 +463,3 @@ public class AccountHandler extends HttpServlet {
 	}
 
 }
-
-
-/* this is the code that was on logout servlet(currently unused)
- * public class logoutServlet extends HttpServlet {
-	private static final long serialVersionUID = 1L;
-       
-    public logoutServlet() {
-        super();
-    }
-
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		response.getWriter().append("Served at: ").append(request.getContextPath());
-	}
-
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
-		doGet(request, response);
-	}
-
-}
- * */

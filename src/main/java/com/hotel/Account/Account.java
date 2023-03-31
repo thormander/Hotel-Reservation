@@ -1,5 +1,8 @@
 package com.hotel.Account;
 
+/*Account Class:
+ *	Holds getter, setter, and default constructor
+ * */
 public class Account {
 
     private String email_id;
@@ -37,7 +40,5 @@ public class Account {
         this.type = type;
     }
 
-    public Account() {
-		// TODO Auto-generated constructor stub
-	}
+    public Account() {}
 }
