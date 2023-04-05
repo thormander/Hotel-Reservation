@@ -99,7 +99,7 @@ public class ReservationHandler extends HttpServlet {
 		
 	}
 	
-	private void StartReservation(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	public void StartReservation(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		String startDate = request.getParameter("startDate");
 		String endDate = request.getParameter("endDate");
@@ -180,6 +180,8 @@ public class ReservationHandler extends HttpServlet {
 	
 				dispatcher.forward(request, response);
 				
+				request.setAttribute("status", "success"); //for unit testing
+				
 			} catch (Exception e)
 			{
 				e.printStackTrace();
@@ -192,7 +194,7 @@ public class ReservationHandler extends HttpServlet {
 		}
 	}
 	
-	private void CreateReservation(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	public void CreateReservation(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		String id = request.getParameter("roomId");
 		
@@ -233,6 +235,8 @@ public class ReservationHandler extends HttpServlet {
 			
 			dispatcher = request.getRequestDispatcher("reservationConfirmation.jsp");
 			dispatcher.forward(request, response);
+			
+			request.setAttribute("status", "success"); //for unit testing
 			
 		} catch (Exception e)
 		{

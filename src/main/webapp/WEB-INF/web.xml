@@ -144,4 +144,34 @@
     <servlet-name>GetReservations</servlet-name>
     <url-pattern>/GetReservations</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>EmailHandler</display-name>
+    <servlet-name>EmailHandler</servlet-name>
+    <servlet-class>com.hotel.email.EmailHandler</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>EmailHandler</servlet-name>
+    <url-pattern>/EmailHandler</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>Email</display-name>
+    <servlet-name>Email</servlet-name>
+    <servlet-class>com.hotel.email.Email</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Email</servlet-name>
+    <url-pattern>/Email</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>EmailController</display-name>
+    <servlet-name>EmailController</servlet-name>
+    <servlet-class>com.hotel.email.EmailController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>EmailController</servlet-name>
+    <url-pattern>/EmailController</url-pattern>
+  </servlet-mapping>
 </web-app>

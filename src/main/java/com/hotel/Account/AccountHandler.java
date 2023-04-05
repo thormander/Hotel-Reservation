@@ -15,6 +15,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import com.hotel.email.EmailController;
+
+
 /*
  * Servlet implementation class AccountHandler
  */
@@ -183,6 +186,8 @@ public class AccountHandler extends HttpServlet {
 			if (rowCount > 0)
 			{
 				request.setAttribute("status", "success");
+			    EmailController emailController = new EmailController();
+			    emailController.sendRegistrationConfirmationEmail(uemail, username);
 			}
 			else
 			{
