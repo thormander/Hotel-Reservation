@@ -91,6 +91,10 @@ public class ReservationHandler extends HttpServlet {
 			System.out.println("Return to reservations executed!");
 			viewMyReservations(request, response);
 			break;
+		case "checkOutStart":
+			System.out.print("checkout has begun");
+			checkoutStart(request, response);
+			break;
 			
 		default:
 			System.out.print("nothing executed in reservationHandler ! :(");
@@ -209,7 +213,7 @@ public class ReservationHandler extends HttpServlet {
 			//SQL query to database here. (PLEASE NAME YOUR DB TO hotel)
 			
 			//Call the reservation Catalog and room catalog.
-			PreparedStatement pst = con.prepareStatement("Insert into reservation (id,startDate,endDate,reservationName,accountType) values (?,?,?,?,?)");
+			PreparedStatement pst = con.prepareStatement("Insert into reservation (id,startDate,endDate,reservationName,accountType,isCheckedIn) values (?,?,?,?,?,'0')");
 		
 			String startDate = (String) session.getAttribute("startDate");
 			String endDate = (String) session.getAttribute("endDate");
@@ -472,6 +476,62 @@ public class ReservationHandler extends HttpServlet {
 			reservationStep = "submitReservationModify";
 		}
 		return reservationStep;
+	}
+	
+	//checkout for client
+	public void checkoutStart(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		HttpSession session = request.getSession();
+	
+		
+		try 
+		{
+			String email = request.getParameter("emailName");
+			RequestDispatcher dispatcher = null;
+			
+			try {
+				Class.forName("com.mysql.cj.jdbc.Driver");
+				//CONNECTION TO DB (change "hotel" to whatever you database name is.)
+				Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=UTC","root", "1234");
+				//SQL query to database here. (PLEASE NAME YOUR DB TO hotel)
+				PreparedStatement pst = con.prepareStatement("SELECT * FROM reservation WHERE reservationName = ? AND accountType='guest' AND isCheckedIn='1'");
+				
+				pst.setString(1, email);
+				session.setAttribute("guestName", email);
+				
+				ResultSet rs = pst.executeQuery();
+				List<Reservation> myList = new ArrayList<>();
+				
+			
+				request.setAttribute("status", "success"); //used for unit test to ensure it passed query
+				
+				while(rs.next()) {
+					Reservation a = new Reservation();
+					a.setRoomId(rs.getString("id"));
+					System.out.print(a.getRoomId());
+					a.setStartDate(rs.getString("startDate"));
+					a.setEndDate(rs.getString("endDate"));
+					a.setCheckInDate(rs.getString("checkInDate"));
+					a.setReservationName(rs.getString("reservationName"));
+					
+					myList.add(a);
+					
+				}
+				
+				request.setAttribute("guestReservation", myList);
+				dispatcher = request.getRequestDispatcher("checkOutReservations.jsp");
+				dispatcher.forward(request, response);
+			
+				
+			} catch (SQLException | ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+		} catch (Exception e) { 
+			e.printStackTrace();
+		}
+		
+		
+		
+		
 	}
 	
 	

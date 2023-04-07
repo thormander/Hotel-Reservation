@@ -10,7 +10,11 @@ public class Reservation{
     private String accountType;
     private String roomInformation;
     private String roomId;
+    private boolean isCheckedIn;
+    private String checkInDate;
     
+    
+    //getId is actually registration ID
     public String getId() {
         return id;
     }
@@ -63,8 +67,22 @@ public class Reservation{
     public void setAccountType(String accountType) {
         this.accountType = accountType;
     }
+    
+    public boolean getIsCheckedIn() {
+    	return isCheckedIn;
+    }
+    public void setIsCheckedIn(boolean isCheckedIn) {
+    	this.isCheckedIn = isCheckedIn;
+    }
+    
+    public String getCheckInDate() {
+    	return checkInDate;
+    }
+
+    public void setCheckInDate(String checkInDate) {
+    	this.checkInDate= checkInDate;
+    }
 
     
-    public Reservation() {}
 
 }

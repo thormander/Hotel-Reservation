@@ -17,12 +17,14 @@
 <title>Coding Ninja's Hotel</title>
 
 <script>
+
 function showErrorMessage() {
     var errorMessage = '<%= request.getAttribute("errorMessage") %>';
     if (errorMessage) {
         alert(errorMessage);
     }
 }
+
 </script>
 
 </head>
@@ -72,6 +74,34 @@ function showErrorMessage() {
 				</div>
 			</div>
 		</section>
+		
+		<section class="resetPassword">
+			<div>
+			
+				<h2>Reset Admin User Password</h2>
+					<form method="post" action="accountHandler">
+					<input type="hidden" name="accountType" value="modifyAdmin">
+						<div class="form-group">
+							<input type="text" name="name" id="nameFull" placeholder="Your Name" required="required"/>
+						</div>
+						<div class="form-group">
+							<input type="email" name="email" id="userEmail" placeholder="Your Email" required="required"/>
+						</div>
+						<div class="form-group">
+							<input type="password" name="passOld" id="pass" placeholder="Old Password" required="required"/>
+						</div>								
+						<div class="form-group">
+							<input type="password" name="pass" id="pass" placeholder="New Password" required="required"/>
+						</div>
+						<div class="form-group form-button">
+							<input type="submit" name="modifyAdmin" id="signup"
+								class="form-submit" value="Modify" />
+						</div>
+					</form>
+			</div>
+		</section>
+		
+		
 	<form action="accountHandler" method="post">
 		<input type="hidden" name="accountType" value="logout">
   		<button type="submit">Logout</button>

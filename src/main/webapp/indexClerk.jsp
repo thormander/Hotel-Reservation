@@ -19,8 +19,21 @@
 <!------------------------------------------------------------------------------------------------------------------->
 <body>
 	<a href="modifyClerk.jsp">Modify Account?</a>
-	<h1>Clerk dashboard</h1>
+	<h1>Clerk Dashboard</h1>
 	<a href="roomList.jsp">Access Room List</a>
+	
+	<div>
+		<h2>Checkout Guest</h2>
+		<form action="reservationHandler" method="post">
+			<input type="hidden" name="reservationStep" value="checkOutStart">
+			<div>
+				<input type="email" name="emailName"></input>
+			</div>
+			
+			<button type="submit">Checkout Guest</button>
+		</form>
+	</div>
+	
 
 
 	<form action="accountHandler" method="post">

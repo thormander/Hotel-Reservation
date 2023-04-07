@@ -68,6 +68,10 @@ public class AccountHandler extends HttpServlet {
 			System.out.println("register clerk executed!");
 			registerClerk(request,response);
 			break;	
+		case "modifyAdmin": //index admin.jsp:
+			System.out.println("modify admin executed!");
+			modifyAdmin(request,response);
+			break;
 			
 		default: //default to logout (Can change to a switch case if needed)
 			System.out.print("logout executed!");
@@ -469,6 +473,66 @@ public class AccountHandler extends HttpServlet {
 		{
 			e.printStackTrace();
 		}
+	}
+	
+
+	/* modifyAdmin:
+	 *	This function updates the password for an existing guest account in the database.
+	 * */
+	public void modifyAdmin(HttpServletRequest request, HttpServletResponse response) {
+		
+		String uemail = request.getParameter("email");
+		String upass = request.getParameter("pass");
+		String uname = request.getParameter("name");
+		String upassOld = request.getParameter("passOld");
+		
+		
+		RequestDispatcher dispatcher = null;
+		Connection con = null;
+		
+		try 
+		{
+			
+
+			Class.forName("com.mysql.cj.jdbc.Driver");			
+			//CONNECTION TO DB (change "hotel" to whatever you database name is.)
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC","root", "1234");
+			//SQL query to database here
+			
+			PreparedStatement pst = con.prepareStatement("UPDATE `hotel`.`account` SET `password` = ? WHERE (`email_id` = ? AND `user_name` = ? AND `password` = ? AND `type` = 'admin')");	
+			pst.setString(1, upass);
+			pst.setString(2, uemail);
+			pst.setString(3, uname);
+			pst.setString(4, upassOld);
+			
+			pst.executeUpdate();
+			
+			request.setAttribute("status", "success"); //for unit testing
+			
+			dispatcher = request.getRequestDispatcher("indexAdmin.jsp");
+			
+			dispatcher.forward(request, response);
+		
+		} 
+		
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+		} 
+		
+		finally
+		{
+			
+			try
+			{
+				con.close();
+			}
+			catch (SQLException e)
+			{
+				e.printStackTrace();
+			}
+		}
+		
 	}
 
 }
