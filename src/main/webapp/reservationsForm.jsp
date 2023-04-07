@@ -18,7 +18,7 @@
 <!------------------------------------------------------------------------------------------------------------------->
 <body>
 
-	<div class="main">
+	<div>
 		<section class="signup">
 			<div class="container">
 				<div class="signup-content">

@@ -92,17 +92,73 @@ public class ReservationHandler extends HttpServlet {
 			viewMyReservations(request, response);
 			break;
 		case "checkOutStart":
-			System.out.print("checkout has begun");
+			System.out.println("checkout has begun!");
 			checkoutStart(request, response);
+			break;
+		case "checkOutConfirm":
+			System.out.println("Confirm checkout has begun!");
+			try {
+				checkoutConfirm(request, response);
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
 			break;
 			
 		default:
-			System.out.print("nothing executed in reservationHandler ! :(");
+			System.out.println("nothing executed in reservationHandler ! :(");
 			break;
 		}
 		
 	}
 	
+	private void checkoutConfirm(HttpServletRequest request, HttpServletResponse response) throws ClassNotFoundException {
+	    String reservationId = request.getParameter("confirmCheckout");
+	    String guestType = request.getParameter("corporateGuest");
+		
+		RequestDispatcher dispatcher = null;
+	    
+	    if ("corpo".equals(guestType)) { // handle corporate guest
+	        System.out.println("Corporate Guest Reservation Checked out!");
+			try {
+		    	Class.forName("com.mysql.cj.jdbc.Driver");
+				//CONNECTION TO DB (change "hotel" to whatever you database name is.)
+				Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=UTC","root", "1234");
+				//SQL query to database here. (PLEASE NAME YOUR DB TO hotel)
+				
+				PreparedStatement pst = con.prepareStatement("DELETE FROM reservation WHERE reservationID = ?");				
+				
+				pst.setString(1, reservationId);
+				pst.executeUpdate();
+				
+				checkoutStart(request,response);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+	    	
+	    } else { // handle regular guest
+	    	System.out.println("Regular Guest Reservation Checked out!");
+			try {
+		    	Class.forName("com.mysql.cj.jdbc.Driver");
+				//CONNECTION TO DB (change "hotel" to whatever you database name is.)
+				Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=UTC","root", "1234");
+				//SQL query to database here. (PLEASE NAME YOUR DB TO hotel)
+				
+				//Call the reservation Catalog and room catalog.
+				PreparedStatement pst = con.prepareStatement("DELETE FROM reservation WHERE reservationID = ?");				
+				pst.setString(1, reservationId);
+				pst.executeUpdate();
+				
+				checkoutStart(request,response);
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+	    	
+	    	
+	    }
+	}
+
 	public void StartReservation(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		String startDate = request.getParameter("startDate");
@@ -478,7 +534,7 @@ public class ReservationHandler extends HttpServlet {
 		return reservationStep;
 	}
 	
-	//checkout for client
+	//checkout for client  (if testing this, make sure to change to 1 for isCheckedIn)
 	public void checkoutStart(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		HttpSession session = request.getSession();
 	
@@ -507,12 +563,11 @@ public class ReservationHandler extends HttpServlet {
 				while(rs.next()) {
 					Reservation a = new Reservation();
 					a.setRoomId(rs.getString("id"));
-					System.out.print(a.getRoomId());
 					a.setStartDate(rs.getString("startDate"));
 					a.setEndDate(rs.getString("endDate"));
 					a.setCheckInDate(rs.getString("checkInDate"));
 					a.setReservationName(rs.getString("reservationName"));
-					
+					a.setId(rs.getString("reservationID")); //needed for tracking to query exact reservation
 					myList.add(a);
 					
 				}
