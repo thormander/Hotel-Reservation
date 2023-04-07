@@ -27,17 +27,15 @@
 						<form method="post" action="accountHandler" class="register-form" id="login-form">
 							<input type="hidden" name="accountType" value="guest">
 							<div class="form-group">
-								<label for="username"><i
-									class="zmdi zmdi-account material-icons-name"></i></label> <input
+								<label for="username"></label> <input
 									type="text" name="username" id="username"
 									placeholder="Your Email" required="required"/>
 							</div>
 							<div class="form-group">
-								<label for="password"><i class="zmdi zmdi-lock"></i></label> <input
-									type="password" name="password" id="password"
+								<<input type="password" name="password" id="password"
 									placeholder="Password" required="required"/>
 							</div>
-							<div class="form-group form-button">
+							<div>
 								<input type="submit" name="signin" id="signin"
 									class="form-submit" value="Log in" />
 							</div>

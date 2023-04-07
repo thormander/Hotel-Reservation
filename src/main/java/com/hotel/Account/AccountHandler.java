@@ -72,6 +72,10 @@ public class AccountHandler extends HttpServlet {
 			System.out.println("modify admin executed!");
 			modifyAdmin(request,response);
 			break;
+		case "modifyBilling": //accountbilling.jsp
+			System.out.println("modify billing executed!");
+			modifyBilling(request,response);
+			break;
 			
 		default: //default to logout (Can change to a switch case if needed)
 			System.out.print("logout executed!");
@@ -81,10 +85,60 @@ public class AccountHandler extends HttpServlet {
 		
 	}
 	
+
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		doGet(request, response); //just pass to doGet...(for account handler, does not make a difference to use one or the other)
 	}
 
+	
+	private void modifyBilling(HttpServletRequest request, HttpServletResponse response) {
+	    String ccNum = request.getParameter("creditCardNum");
+	    String ccExp = request.getParameter("creditCardExp");
+	    String ccAddress = request.getParameter("creditCardAddress");
+	    String billingCompany = request.getParameter("billingCompany");
+	    String employer = request.getParameter("companyName");
+
+	    HttpSession session = request.getSession();
+	    String currentUser = (String) session.getAttribute("email");
+
+	    RequestDispatcher dispatcher = null;
+	    Connection con = null;
+
+	    try {
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			//CONNECTION TO DB (change "hotel" to whatever you database name is.)
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=UTC","root", "1234");
+
+	        String updateQuery = "UPDATE account SET ccNum=?, ccExp=?, ccAddress=?"
+	                + (billingCompany != null ? ", employer=?" : "")
+	                + " WHERE email_id=?";
+
+	        PreparedStatement modifyQuery = con.prepareStatement(updateQuery);
+	        modifyQuery.setString(1, ccNum);
+	        modifyQuery.setString(2, ccExp);
+	        modifyQuery.setString(3, ccAddress);
+
+	        if (billingCompany != null) {
+	            modifyQuery.setString(4, employer);
+	            modifyQuery.setString(5, currentUser);
+	            System.out.println("Employer Billing Address Added!");
+	        } else {
+	            modifyQuery.setString(4, currentUser);
+	        	System.out.println("Guest Billing Address Added!");
+	        }
+	        modifyQuery.executeUpdate();
+
+	        // close database connection
+	        con.close();
+
+	        dispatcher = request.getRequestDispatcher("index.jsp");
+	        dispatcher.forward(request, response);
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	}
+	
 	/*logout:
 	 *	This function logs out the user by invalidating the session and redirecting to the login page.
 	 * */
@@ -96,7 +150,6 @@ public class AccountHandler extends HttpServlet {
 		    request.setAttribute("status", "success"); //for unit testing
 		}
 		request.getRequestDispatcher("/login.jsp").forward(request,response);
-		
 		
 	}
 

@@ -27,7 +27,7 @@
 		<form action="reservationHandler" method="post">
 			<input type="hidden" name="reservationStep" value="checkOutStart">
 			<div>
-				<input type="email" name="emailName"></input>
+				<input type="email" placeholder="Guest Email" name="emailName" required="required"></input>
 			</div>
 			
 			<button type="submit">Checkout Guest</button>

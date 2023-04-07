@@ -19,14 +19,15 @@
 <!------------------------------------------------------------------------------------------------------------------->
 <body>
 	<h1>Welcome!</h1>
-
-	<a href="modifyGuest.jsp">Modify Account?</a><br/>
-	<a href="searchRooms.jsp">Search Rooms?</a><br/>
+	<ul>
+		<li><a href="modifyGuest.jsp">Modify Account?</a></li>
+		<li><a href="accountbilling.jsp?sessionValue=${sessionScope.email}">Add or Modify Billing information?</a></li>
+		<li><a href="searchRooms.jsp">Search Rooms?</a></li>
+	</ul>
 	<form action="reservationHandler" method="post">
 		<input type="hidden" name="reservationStep" value="getReservations">
 		<button type="submit" value="${sessionScope.email}">My Reservations</button>
 	</form>
-
 	<form action="accountHandler" method="post">
 		<input type="hidden" name="accountType" value="logout">
   		<button type="submit">Logout</button>
