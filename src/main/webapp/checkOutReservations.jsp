@@ -35,6 +35,7 @@
 					</thead>
 					<tbody>
 							<c:forEach var="reservation" items="${guestReservation}">
+							<input type="hidden" name="guestCheckoutEmail" value="${reservation.reservationName}"> <!-- This is for the email controller -->
 							<tr>
 								<td><c:out value="${reservation.roomId}"/></td>
 								<td><c:out value="${reservation.checkInDate}" /></td>

@@ -1,5 +1,7 @@
 package com.hotel.reservation;
 
+
+
 import jakarta.servlet.RequestDispatcher;
 
 import jakarta.servlet.ServletException;
@@ -17,6 +19,8 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 import java.sql.SQLException;
+
+import com.hotel.email.EmailController;
 
 
 
@@ -114,8 +118,8 @@ public class ReservationHandler extends HttpServlet {
 	private void checkoutConfirm(HttpServletRequest request, HttpServletResponse response) throws ClassNotFoundException {
 	    String reservationId = request.getParameter("confirmCheckout");
 	    String guestType = request.getParameter("corporateGuest");
-	    String guestEmail = request.getParameter("reservationName");
-		
+	    String guestEmail = request.getParameter("guestCheckoutEmail");
+	    
 		RequestDispatcher dispatcher = null;
 	    
 	    if ("corpo".equals(guestType)) { // handle corporate guest
@@ -131,10 +135,15 @@ public class ReservationHandler extends HttpServlet {
 				pst.setString(1, reservationId);
 				pst.executeUpdate();
 				
+				//send out email for checkout
+				EmailController emailController = new EmailController();
+				emailController.sendCheckoutConfirmationEmail(guestEmail);
+				
 		        //Pass guest email to 'checkoutStart' function to have list pop up again
 		        HttpSession session = request.getSession();
 		        session.setAttribute("guestEmail", guestEmail);
 				checkoutStart(request,response);
+				
 				
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -152,6 +161,10 @@ public class ReservationHandler extends HttpServlet {
 				PreparedStatement pst = con.prepareStatement("DELETE FROM reservation WHERE reservationID = ?");				
 				pst.setString(1, reservationId);
 				pst.executeUpdate();
+				
+				//send out email for checkout
+				EmailController emailController = new EmailController();
+				emailController.sendCheckoutConfirmationEmail(guestEmail);
 				
 		        //Pass guest email to 'checkoutStart' function to have list pop up again
 		        HttpSession session = request.getSession();
@@ -549,6 +562,7 @@ public class ReservationHandler extends HttpServlet {
 		{
 			String email = null;
 			
+			//For session email check when function called by checkoutConfirm
 			if (session.getAttribute("guestName") != null) {
 				email = (String) session.getAttribute("guestName");
 			} else {
