@@ -95,14 +95,14 @@ public class ReservationHandler extends HttpServlet {
 			System.out.println("Return to reservations executed!");
 			viewMyReservations(request, response);
 			break;
-		case "checkOutStart":
+		case "checkOutStart": //indexClerk.jsp
 			System.out.println("checkout has begun!");
 			checkoutStart(request, response);
 			break;
-		case "checkOutConfirm":
+		case "checkOutConfirm": //checkOutReservations.jsp
 			System.out.println("Confirm checkout has begun!");
 			try {
-				checkoutConfirm(request, response);
+				checkoutBillingConfirm(request, response);  // --> THIS IS A BIG BOI
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 			}
@@ -115,68 +115,155 @@ public class ReservationHandler extends HttpServlet {
 		
 	}
 	
-	private void checkoutConfirm(HttpServletRequest request, HttpServletResponse response) throws ClassNotFoundException {
-	    String reservationId = request.getParameter("confirmCheckout");
-	    String guestType = request.getParameter("corporateGuest");
-	    String guestEmail = request.getParameter("guestCheckoutEmail");
+	private void checkoutBillingConfirm(HttpServletRequest request, HttpServletResponse response) throws ClassNotFoundException {
 	    
-		RequestDispatcher dispatcher = null;
-	    
-	    if ("corpo".equals(guestType)) { // handle corporate guest
-	        System.out.println("Corporate Guest Reservation Checked out!");
-			try {
-		    	Class.forName("com.mysql.cj.jdbc.Driver");
-				//CONNECTION TO DB (change "hotel" to whatever you database name is.)
-				Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=UTC","root", "1234");
-				//SQL query to database here. (PLEASE NAME YOUR DB TO hotel)
-				
-				PreparedStatement pst = con.prepareStatement("DELETE FROM reservation WHERE reservationID = ?");				
-				
-				pst.setString(1, reservationId);
-				pst.executeUpdate();
-				
-				//send out email for checkout
-				EmailController emailController = new EmailController();
-				emailController.sendCheckoutConfirmationEmail(guestEmail);
-				
-		        //Pass guest email to 'checkoutStart' function to have list pop up again
-		        HttpSession session = request.getSession();
-		        session.setAttribute("guestEmail", guestEmail);
-				checkoutStart(request,response);
-				
-				
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+		String actionType = request.getParameter("actionType");
+		
+		
+		//represents the two buttons on the front end
+		if ("confirmCheckout".equals(actionType)) { // handles checkout button <------------
+			String reservationId = request.getParameter("reservationId");
+		    String guestType = request.getParameter("corporateGuest");
+		    String guestEmail = request.getParameter("guestCheckoutEmail");
+		    
+			RequestDispatcher dispatcher = null;
+		    
+		    if ("corpo".equals(guestType)) { // handle corporate guest
+		        System.out.println("Corporate Guest Reservation Checked out!");
+				try {
+			    	Class.forName("com.mysql.cj.jdbc.Driver");
+					//CONNECTION TO DB (change "hotel" to whatever you database name is.)
+					Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=UTC","root", "1234");
+					//SQL query to database here. (PLEASE NAME YOUR DB TO hotel)
+					PreparedStatement pst = con.prepareStatement("DELETE FROM reservation WHERE reservationID = ?");				
+					
+					pst.setString(1, reservationId);
+					pst.executeUpdate();
+					
+					//send out email for checkout
+					EmailController emailController = new EmailController();
+					emailController.sendCheckoutConfirmationEmail(guestEmail);
+					
+			        //Pass guest email to 'checkoutStart' function to have list pop up again
+			        HttpSession session = request.getSession();
+			        session.setAttribute("guestEmail", guestEmail);
+					checkoutStart(request,response);	
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 
-	    	
-	    } else { // handle regular guest
-	    	System.out.println("Regular Guest Reservation Checked out!");
-			try {
-		    	Class.forName("com.mysql.cj.jdbc.Driver");
-				//CONNECTION TO DB (change "hotel" to whatever you database name is.)
-				Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=UTC","root", "1234");
-				//SQL query to database here. (PLEASE NAME YOUR DB TO hotel)
-				
-				PreparedStatement pst = con.prepareStatement("DELETE FROM reservation WHERE reservationID = ?");				
-				pst.setString(1, reservationId);
-				pst.executeUpdate();
-				
-				//send out email for checkout
-				EmailController emailController = new EmailController();
-				emailController.sendCheckoutConfirmationEmail(guestEmail);
-				
-		        //Pass guest email to 'checkoutStart' function to have list pop up again
-		        HttpSession session = request.getSession();
-		        session.setAttribute("guestEmail", guestEmail);
-				checkoutStart(request,response);
-				
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-	    	
-	    	
-	    }
+		    } else { // handle regular guest
+		    	System.out.println("Regular Guest Reservation Checked out!");
+				try {
+			    	Class.forName("com.mysql.cj.jdbc.Driver");
+					//CONNECTION TO DB (change "hotel" to whatever you database name is.)
+					Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=UTC","root", "1234");
+					//SQL query to database here. (PLEASE NAME YOUR DB TO hotel)
+					PreparedStatement pst = con.prepareStatement("DELETE FROM reservation WHERE reservationID = ?");				
+					pst.setString(1, reservationId);
+					pst.executeUpdate();
+					
+					//send out email for checkout
+					EmailController emailController = new EmailController();
+					emailController.sendCheckoutConfirmationEmail(guestEmail);
+					
+			        //Pass guest email to 'checkoutStart' function to have list pop up again
+			        HttpSession session = request.getSession();
+			        session.setAttribute("guestEmail", guestEmail);
+					checkoutStart(request,response);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+		    }
+			
+		} else if ("generateBill".equals(actionType)) { // handle generate bill button  <------------
+			String reservationId = request.getParameter("reservationId");
+		    String guestType = request.getParameter("corporateGuest");
+		    String guestEmail = request.getParameter("guestCheckoutEmail");
+			
+			RequestDispatcher dispatcher = null;
+		    
+		    if ("corpo".equals(guestType)) { // handle corporate guest
+		        System.out.println("Corporate Guest bill generated!");
+				try {
+			    	Class.forName("com.mysql.cj.jdbc.Driver");
+					//CONNECTION TO DB (change "hotel" to whatever you database name is.)
+					Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=UTC","root", "1234");
+
+			        String query = "SELECT r.durationOfStay * (CASE rm.Quality "
+					                + "                    WHEN 'Excellent' THEN 150 "
+					                + "                    WHEN 'Good' THEN 100 "
+					                + "                    WHEN 'Average' THEN 80 "
+					                + "                    WHEN 'Poor' THEN 50 "
+					                + "                    ELSE 0 "
+					                + "                    END) as amountDue "
+					                + "FROM reservation r JOIN rooms rm USING(id) WHERE r.reservationID = ?";
+			        
+					PreparedStatement pst = con.prepareStatement(query);
+					pst.setString(1, reservationId);
+					
+					ResultSet rs = pst.executeQuery();
+					double amountDue = 0;
+					if (rs.next()) {
+					    amountDue = rs.getDouble("amountDue");
+					}
+					
+				    //Get the company name that the guest works for
+				    PreparedStatement pst2 = con.prepareStatement("SELECT employer FROM account WHERE email_id = ?");
+				    pst2.setString(1, guestEmail);
+				    
+				    ResultSet rs2 = pst2.executeQuery();
+				    String employer = "";
+				    if (rs2.next()) {
+				    	employer = rs2.getString("employer");
+				    }				
+					
+					request.setAttribute("amountDue", amountDue);
+					request.setAttribute("guestType", "corpo"); // Forward the guestType
+					request.setAttribute("employer", employer); // Forward company name
+
+					dispatcher = request.getRequestDispatcher("generateBill.jsp");
+					dispatcher.forward(request, response);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+		    } else { // handle regular guest
+		    	System.out.println("Regular Guest bill generated!");
+				try {
+			    	Class.forName("com.mysql.cj.jdbc.Driver");
+					//CONNECTION TO DB (change "hotel" to whatever you database name is.)
+					Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=UTC","root", "1234");
+
+			        String query = "SELECT r.durationOfStay * (CASE rm.Quality "
+					                + "                    WHEN 'Excellent' THEN 150 "
+					                + "                    WHEN 'Good' THEN 100 "
+					                + "                    WHEN 'Average' THEN 80 "
+					                + "                    WHEN 'Poor' THEN 50 "
+					                + "                    ELSE 0 "
+					                + "                    END) as amountDue "
+					                + "FROM reservation r JOIN rooms rm USING(id) WHERE r.reservationID = ?";
+			        
+					PreparedStatement pst = con.prepareStatement(query);
+					pst.setString(1, reservationId);
+					
+					ResultSet rs = pst.executeQuery();
+					double amountDue = 0;
+					if (rs.next()) {
+					    amountDue = rs.getDouble("amountDue");
+					}
+					request.setAttribute("amountDue", amountDue);
+					request.setAttribute("guestType", "regular"); // Forward the guestType
+					
+					dispatcher = request.getRequestDispatcher("generateBill.jsp");
+					dispatcher.forward(request, response);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+		    }
+			
+		}
+
 	}
 
 	public void StartReservation(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

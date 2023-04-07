@@ -90,7 +90,9 @@ public class AccountHandler extends HttpServlet {
 		doGet(request, response); //just pass to doGet...(for account handler, does not make a difference to use one or the other)
 	}
 
-	
+	/*modifyBilling:
+	 *	This function handles adding/modifying user billing information.
+	 * */
 	private void modifyBilling(HttpServletRequest request, HttpServletResponse response) {
 	    String ccNum = request.getParameter("creditCardNum");
 	    String ccExp = request.getParameter("creditCardExp");
@@ -128,7 +130,6 @@ public class AccountHandler extends HttpServlet {
 	        }
 	        modifyQuery.executeUpdate();
 
-	        // close database connection
 	        con.close();
 
 	        dispatcher = request.getRequestDispatcher("index.jsp");
