@@ -21,5 +21,7 @@
     <% } else { %>
         <p>Amount Due for Guest: <%= amountDue %></p>
     <% } %>
+    
+    <a href="javascript:history.back()">Back to Checkout List</a>
 </body>
 </html>
