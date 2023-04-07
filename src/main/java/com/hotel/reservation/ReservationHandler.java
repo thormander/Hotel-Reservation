@@ -114,6 +114,7 @@ public class ReservationHandler extends HttpServlet {
 	private void checkoutConfirm(HttpServletRequest request, HttpServletResponse response) throws ClassNotFoundException {
 	    String reservationId = request.getParameter("confirmCheckout");
 	    String guestType = request.getParameter("corporateGuest");
+	    String guestEmail = request.getParameter("reservationName");
 		
 		RequestDispatcher dispatcher = null;
 	    
@@ -130,7 +131,11 @@ public class ReservationHandler extends HttpServlet {
 				pst.setString(1, reservationId);
 				pst.executeUpdate();
 				
+		        //Pass guest email to 'checkoutStart' function to have list pop up again
+		        HttpSession session = request.getSession();
+		        session.setAttribute("guestEmail", guestEmail);
 				checkoutStart(request,response);
+				
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -144,11 +149,13 @@ public class ReservationHandler extends HttpServlet {
 				Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=UTC","root", "1234");
 				//SQL query to database here. (PLEASE NAME YOUR DB TO hotel)
 				
-				//Call the reservation Catalog and room catalog.
 				PreparedStatement pst = con.prepareStatement("DELETE FROM reservation WHERE reservationID = ?");				
 				pst.setString(1, reservationId);
 				pst.executeUpdate();
 				
+		        //Pass guest email to 'checkoutStart' function to have list pop up again
+		        HttpSession session = request.getSession();
+		        session.setAttribute("guestEmail", guestEmail);
 				checkoutStart(request,response);
 				
 			} catch (Exception e) {
@@ -538,10 +545,16 @@ public class ReservationHandler extends HttpServlet {
 	public void checkoutStart(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		HttpSession session = request.getSession();
 	
-		
 		try 
 		{
-			String email = request.getParameter("emailName");
+			String email = null;
+			
+			if (session.getAttribute("guestName") != null) {
+				email = (String) session.getAttribute("guestName");
+			} else {
+				email = request.getParameter("emailName");
+			}
+			
 			RequestDispatcher dispatcher = null;
 			
 			try {
@@ -557,9 +570,6 @@ public class ReservationHandler extends HttpServlet {
 				ResultSet rs = pst.executeQuery();
 				List<Reservation> myList = new ArrayList<>();
 				
-			
-				request.setAttribute("status", "success"); //used for unit test to ensure it passed query
-				
 				while(rs.next()) {
 					Reservation a = new Reservation();
 					a.setRoomId(rs.getString("id"));
@@ -573,6 +583,7 @@ public class ReservationHandler extends HttpServlet {
 				}
 				
 				request.setAttribute("guestReservation", myList);
+				
 				dispatcher = request.getRequestDispatcher("checkOutReservations.jsp");
 				dispatcher.forward(request, response);
 			
@@ -583,10 +594,7 @@ public class ReservationHandler extends HttpServlet {
 		} catch (Exception e) { 
 			e.printStackTrace();
 		}
-		
-		
-		
-		
+
 	}
 	
 	
