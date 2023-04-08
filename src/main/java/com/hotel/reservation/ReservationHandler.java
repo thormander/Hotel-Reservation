@@ -18,6 +18,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.sql.SQLException;
 
 import com.hotel.email.EmailController;
@@ -134,7 +135,34 @@ public class ReservationHandler extends HttpServlet {
 			    	Class.forName("com.mysql.cj.jdbc.Driver");
 					//CONNECTION TO DB (change "hotel" to whatever you database name is.)
 					Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=UTC","root", "1234");
-					//SQL query to database here. (PLEASE NAME YOUR DB TO hotel)
+					
+					//Fetch data for storage------------------------------------
+					String fetchQuery = "SELECT r.startDate,r.endDate,r.checkInDate,a.employer FROM reservation r JOIN account a ON(r.reservationName = a.email_id) WHERE r.reservationName = ?";
+					PreparedStatement pstStorageFetch = con.prepareStatement(fetchQuery);
+					pstStorageFetch.setString(1, guestEmail);
+					ResultSet storageFetchQuery = pstStorageFetch.executeQuery();
+				    
+				    if (storageFetchQuery.next()) {
+						// Calculate the duration in days
+					    java.sql.Date startDate = storageFetchQuery.getDate("startDate");
+					    java.sql.Date endDate = storageFetchQuery.getDate("endDate");
+					    long durationInMillis = endDate.getTime() - startDate.getTime();
+					    int durationInDays = (int) TimeUnit.DAYS.convert(durationInMillis, TimeUnit.MILLISECONDS);
+				    	
+				    	//Insert data to storage
+						PreparedStatement pstStorage = con.prepareStatement("INSERT INTO storage(reservationID,startDate,endDate,checkInDate,guest_email,employer,durationOfStay) values(?,?,?,?,?,?,?)");
+						pstStorage.setString(1,reservationId);
+						pstStorage.setDate(2,storageFetchQuery.getDate("startDate"));
+						pstStorage.setDate(3,storageFetchQuery.getDate("endDate"));
+						pstStorage.setDate(4,storageFetchQuery.getDate("checkInDate"));
+						pstStorage.setString(5,guestEmail);
+						pstStorage.setString(6,storageFetchQuery.getString("employer"));
+						pstStorage.setInt(7,durationInDays);
+						pstStorage.execute();
+						System.out.println("Data Saved to storage!");
+					}
+					// ---------------------------------------------------------
+					
 					PreparedStatement pst = con.prepareStatement("DELETE FROM reservation WHERE reservationID = ?");				
 					
 					pst.setString(1, reservationId);
@@ -158,7 +186,36 @@ public class ReservationHandler extends HttpServlet {
 			    	Class.forName("com.mysql.cj.jdbc.Driver");
 					//CONNECTION TO DB (change "hotel" to whatever you database name is.)
 					Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=UTC","root", "1234");
-					//SQL query to database here. (PLEASE NAME YOUR DB TO hotel)
+					
+					
+					//Fetch data for storage------------------------------------
+					String fetchQuery = "SELECT r.startDate,r.endDate,r.checkInDate,a.employer FROM reservation r JOIN account a ON(r.reservationName = a.email_id) WHERE r.reservationName = ?";
+					PreparedStatement pstStorageFetch = con.prepareStatement(fetchQuery);
+					pstStorageFetch.setString(1, guestEmail);
+					ResultSet storageFetchQuery = pstStorageFetch.executeQuery();
+				    
+				    if (storageFetchQuery.next()) {
+						// Calculate the duration in days
+					    java.sql.Date startDate = storageFetchQuery.getDate("startDate");
+					    java.sql.Date endDate = storageFetchQuery.getDate("endDate");
+					    long durationInMillis = endDate.getTime() - startDate.getTime();
+					    int durationInDays = (int) TimeUnit.DAYS.convert(durationInMillis, TimeUnit.MILLISECONDS);
+				    	
+				    	//Insert data to storage
+						PreparedStatement pstStorage = con.prepareStatement("INSERT INTO storage(reservationID,startDate,endDate,checkInDate,guest_email,employer,durationOfStay) values(?,?,?,?,?,?,?)");
+						pstStorage.setString(1,reservationId);
+						pstStorage.setDate(2,storageFetchQuery.getDate("startDate"));
+						pstStorage.setDate(3,storageFetchQuery.getDate("endDate"));
+						pstStorage.setDate(4,storageFetchQuery.getDate("checkInDate"));
+						pstStorage.setString(5,guestEmail);
+						pstStorage.setString(6,storageFetchQuery.getString("employer"));
+						pstStorage.setInt(7,durationInDays);
+						pstStorage.execute();
+						System.out.println("Data Saved to storage!");
+					}
+					// ---------------------------------------------------------
+					
+					
 					PreparedStatement pst = con.prepareStatement("DELETE FROM reservation WHERE reservationID = ?");				
 					pst.setString(1, reservationId);
 					pst.executeUpdate();
