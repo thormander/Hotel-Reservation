@@ -1,5 +1,5 @@
 # Hotel-Reservation
-### Functionality Requirements:
+### Project Requirements:
 - As a hotel guest:
   - Create a guest account, and log in/log out.
   - Modify their own guest account.
@@ -21,3 +21,9 @@
 - Extra:
   - Hotel guest membership with points earning/redeem system.
   - Email notification system.
+
+### Technologies Used:
+- Database: mySQL
+- Server: Apache Tomcat 
+- IDE: Eclipse
+- Tests: JUnit
