@@ -1,4 +1,5 @@
 # Hotel-Reservation
+### Functionality Requirements:
 - As a hotel guest:
   - Create a guest account, and log in/log out.
   - Modify their own guest account.
