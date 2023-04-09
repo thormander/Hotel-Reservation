@@ -23,7 +23,7 @@
   - Email notification system.
 
 ### Technologies Used:
-- Database: mySQL
-- Server: Apache Tomcat 
-- IDE: Eclipse
-- Tests: JUnit
+- Database: [mySQL](https://www.mysql.com/products/workbench/)
+- Server: [Apache Tomcat](https://tomcat.apache.org/download-10.cgi) 
+- IDE: Eclipse EE
+- Tests: JUnit 5
