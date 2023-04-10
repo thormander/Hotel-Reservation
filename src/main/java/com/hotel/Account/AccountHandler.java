@@ -76,7 +76,6 @@ public class AccountHandler extends HttpServlet {
 			System.out.println("modify billing executed!");
 			modifyBilling(request,response);
 			break;
-			
 		default: //default to logout (Can change to a switch case if needed)
 			System.out.print("logout executed!");
 			logout(request,response);
@@ -85,11 +84,11 @@ public class AccountHandler extends HttpServlet {
 		
 	}
 	
-
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		doGet(request, response); //just pass to doGet...(for account handler, does not make a difference to use one or the other)
 	}
-
+	
+	
 	/*modifyBilling:
 	 *	This function handles adding/modifying user billing information.
 	 * */

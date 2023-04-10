@@ -21,6 +21,9 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.sql.SQLException;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+
 import com.hotel.email.EmailController;
 
 
@@ -108,6 +111,13 @@ public class ReservationHandler extends HttpServlet {
 				e.printStackTrace();
 			}
 			break;
+		case "generateBillingSummary": //index clerk.jsp
+			System.out.println("billing summary executed!");
+			List<Bill> billingSummary = selectAllBills(request, response);
+			request.setAttribute("billSummary", billingSummary);
+		    RequestDispatcher dispatcher = request.getRequestDispatcher("generateBillSummary.jsp");
+		    dispatcher.forward(request, response);
+			break;
 			
 		default:
 			System.out.println("nothing executed in reservationHandler ! :(");
@@ -116,6 +126,43 @@ public class ReservationHandler extends HttpServlet {
 		
 	}
 	
+
+	public List<Bill> selectAllBills(HttpServletRequest request, HttpServletResponse response)
+	{
+		
+		Connection con = null;
+		
+		List<Bill> myBills = new ArrayList<>();
+		try 
+		{ 
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			//CONNECTION TO DB (change "hotel" to whatever you database name is.)
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=UTC","root", "1234");
+			PreparedStatement pst = con.prepareStatement("Select * from storage");
+			ResultSet rs = pst.executeQuery();
+			
+			while(rs.next()) {
+				Bill a = new Bill();
+				a.setEmail(rs.getString("guest_email"));
+				a.setRoomID(rs.getString("reservationID"));
+				a.setCheckInDate(rs.getString("checkInDate"));
+				a.setStartDate(rs.getString("startDate"));
+				a.setEndDate(rs.getString("endDate"));
+				a.setDuration(rs.getString("durationOfStay"));
+				a.setCostOfStay(rs.getString("costOfStay"));
+				myBills.add(a);
+				
+			}
+		} catch (SQLException | ClassNotFoundException e)
+		{  
+			e.printStackTrace();
+		}
+		return myBills;
+	}
+	
+	/*checkoutBillingConfirm:
+	 *	This function handles generating a bill and checkout of guest
+	 * */	
 	private void checkoutBillingConfirm(HttpServletRequest request, HttpServletResponse response) throws ClassNotFoundException {
 	    
 		String actionType = request.getParameter("actionType");
@@ -430,21 +477,26 @@ public class ReservationHandler extends HttpServlet {
 			Class.forName("com.mysql.cj.jdbc.Driver");
 			//CONNECTION TO DB (change "hotel" to whatever you database name is.)
 			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=UTC","root", "1234");
-			//SQL query to database here. (PLEASE NAME YOUR DB TO hotel)
 			
 			//Call the reservation Catalog and room catalog.
-			PreparedStatement pst = con.prepareStatement("Insert into reservation (id,startDate,endDate,reservationName,accountType,isCheckedIn) values (?,?,?,?,?,'0')");
+			PreparedStatement pst = con.prepareStatement("Insert into reservation (id,startDate,endDate,reservationName,accountType,isCheckedIn,durationOfStay) values (?,?,?,?,?,'0',?)");
 		
 			String startDate = (String) session.getAttribute("startDate");
 			String endDate = (String) session.getAttribute("endDate");
 			String reservationName = (String) session.getAttribute("email");
 			String accountType = (String) session.getAttribute("type");
 			
+			// Calculate the duration in days
+	        LocalDate startLocalDate = LocalDate.parse(startDate);
+	        LocalDate endLocalDate = LocalDate.parse(endDate);
+	        long durationInDays = ChronoUnit.DAYS.between(startLocalDate, endLocalDate);
+			
 			pst.setString(1, id);
 			pst.setString(2, startDate);
 			pst.setString(3, endDate);
 			pst.setString(4, reservationName);
 			pst.setString(5, accountType);
+			pst.setLong(6, durationInDays);
 			
 			pst.executeUpdate();
 			

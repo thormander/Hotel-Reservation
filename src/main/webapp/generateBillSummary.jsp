@@ -12,17 +12,24 @@
 <meta name="description" content="" />
 <meta name="author" content="" />
 <title>Coding Ninja's Hotel</title>
-
+<style>
+table 
+{
+  border-collapse: collapse;
+  width: 80%;
+}
+tr ]
+{
+  border-bottom: 1px solid #ddd;
+}
+</style>
+</head>
 <!------------------------------------------------------------------------------------------------------------------->
 <body>
 	
 	<h1>Bill Summary</h1>
-	
-		<form method="post" action="reservationHandler">
-			<input type="hidden" name="reservationStep" value="checkOutConfirm">
 		
 			<table border = "1">
-			
 				<thead>
 					<tr>
 						<th>User</th>
@@ -36,7 +43,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					<c:forEach var="bill" items="${bills}">
+					<c:forEach var="bill" items="${billSummary}">
 						
 						<tr>
 							<td><c:out value="${bill.email}" /></td>
@@ -45,16 +52,13 @@
                              <td><c:out value="${bill.startDate}"/></td>
                              <td><c:out value="${bill.endDate}" /></td>
                              <td><c:out value="${bill.duration}" /></td>
-                             <td><c:out value="${bill.cost}" /></td>
+                           	 <td><c:out value="${bill.costOfStay}" /></td>
 						</tr>
 					</c:forEach>
-		
 				</tbody>
-
 			</table>
 			
-		</form>
-		<a href="clerkIndex.jsp">Back to clerk home</a>
+		<a href="indexClerk.jsp">Back to clerk home</a>
 </body>
 
 

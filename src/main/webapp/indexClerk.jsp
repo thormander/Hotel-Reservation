@@ -33,7 +33,14 @@
 			<button type="submit">Checkout Guest</button>
 		</form>
 	</div>
-	
+	<br>
+	<div>
+		<form action="reservationHandler" method="post">
+			<input type="hidden" name="reservationStep" value="generateBillingSummary">
+			<button type="submit">Get Billing Summary</button>
+		</form>
+	</div>
+	<br>
 
 
 	<form action="accountHandler" method="post">

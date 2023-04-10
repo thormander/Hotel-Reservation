@@ -7,6 +7,7 @@ public class Bill {
     private java.lang.String startDate;
     private java.lang.String endDate;
     private java.lang.String duration;
+    private java.lang.String costOfStay;
 	
     public java.lang.String getEmail() {
 		return email;
@@ -43,5 +44,11 @@ public class Bill {
 	}
 	public void setDuration(java.lang.String duration) {
 		this.duration = duration;
+	}
+	public java.lang.String getCostOfStay() {
+		return costOfStay;
+	}
+	public void setCostOfStay(java.lang.String costOfStay) {
+		this.costOfStay = costOfStay;
 	}
 }
