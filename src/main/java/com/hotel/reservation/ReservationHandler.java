@@ -24,6 +24,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
+import com.hotel.Account.Account;
 import com.hotel.email.EmailController;
 
 
@@ -161,7 +162,7 @@ public class ReservationHandler extends HttpServlet {
 	}
 	
 	/*checkoutBillingConfirm:
-	 *	This function handles generating a bill and checkout of guest
+	 *	This function handles generating a bill and checkout of guest (also adds points on checkout based on each reservation)
 	 * */	
 	private void checkoutBillingConfirm(HttpServletRequest request, HttpServletResponse response) throws ClassNotFoundException {
 	    
@@ -215,6 +216,22 @@ public class ReservationHandler extends HttpServlet {
 					pst.setString(1, reservationId);
 					pst.executeUpdate();
 					
+					//Fetch current points and add 1 point to the guest account---
+					PreparedStatement pstPoints = con.prepareStatement("SELECT points FROM account WHERE email_id = ?");
+					pstPoints.setString(1, guestEmail);
+					ResultSet prs = pstPoints.executeQuery();
+					int currentPoints = 0;
+					if (prs.next()) {
+					    currentPoints = prs.getInt("points");
+					}
+					int updatedPoints = currentPoints + 1;
+					PreparedStatement pstUpdatePoints = con.prepareStatement("UPDATE account SET points = ? WHERE email_id = ?");
+					pstUpdatePoints.setInt(1, updatedPoints);
+					pstUpdatePoints.setString(2, guestEmail);
+					pstUpdatePoints.executeUpdate();
+					System.out.println("One point added!");
+					//------------------------------------------------------------
+					
 					//send out email for checkout
 					EmailController emailController = new EmailController();
 					emailController.sendCheckoutConfirmationEmail(guestEmail);
@@ -266,6 +283,23 @@ public class ReservationHandler extends HttpServlet {
 					PreparedStatement pst = con.prepareStatement("DELETE FROM reservation WHERE reservationID = ?");				
 					pst.setString(1, reservationId);
 					pst.executeUpdate();
+					
+					
+					//Fetch current points and add 1 point to the guest account---
+					PreparedStatement pstPoints = con.prepareStatement("SELECT points FROM account WHERE email_id = ?");
+					pstPoints.setString(1, guestEmail);
+					ResultSet prs = pstPoints.executeQuery();
+					int currentPoints = 0;
+					if (prs.next()) {
+					    currentPoints = prs.getInt("points");
+					}
+					int updatedPoints = currentPoints + 1;
+					PreparedStatement pstUpdatePoints = con.prepareStatement("UPDATE account SET points = ? WHERE email_id = ?");
+					pstUpdatePoints.setInt(1, updatedPoints);
+					pstUpdatePoints.setString(2, guestEmail);
+					pstUpdatePoints.executeUpdate();
+					System.out.println("One point added!");
+					//------------------------------------------------------------
 					
 					//send out email for checkout
 					EmailController emailController = new EmailController();

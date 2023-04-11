@@ -19,6 +19,7 @@
 <!------------------------------------------------------------------------------------------------------------------->
 <body>
 	<h1>Welcome!</h1>
+	<p>Your current points: ${sessionScope.guestPoints}</p>
 	<ul>
 		<li><a href="modifyGuest.jsp">Modify Account?</a></li>
 		<li><a href="accountbilling.jsp?sessionValue=${sessionScope.email}">Add or Modify Billing information?</a></li>

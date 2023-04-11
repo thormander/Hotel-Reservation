@@ -9,6 +9,7 @@ public class Account {
     private String user_name;
     private String password;
     private String type;
+    private int points;
   
     public void setEmailID(String email_id) {
         this.email_id = email_id;
@@ -41,4 +42,10 @@ public class Account {
     }
 
     public Account() {}
+	public int getPoints() {
+		return points;
+	}
+	public void setPoints(int points) {
+		this.points = points;
+	}
 }

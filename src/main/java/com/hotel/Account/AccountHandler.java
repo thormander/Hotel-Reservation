@@ -88,7 +88,6 @@ public class AccountHandler extends HttpServlet {
 		doGet(request, response); //just pass to doGet...(for account handler, does not make a difference to use one or the other)
 	}
 	
-	
 	/*modifyBilling:
 	 *	This function handles adding/modifying user billing information.
 	 * */
@@ -232,7 +231,7 @@ public class AccountHandler extends HttpServlet {
 			//CONNECTION TO DB (change "hotel" to whatever you database name is.)
 			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=UTC","root", "1234");
 			//SQL query to database here
-			PreparedStatement pst = con.prepareStatement("INSERT INTO account(user_name,email_id,password,type) values(?,?,?,'guest')");
+			PreparedStatement pst = con.prepareStatement("INSERT INTO account(user_name,email_id,password,type,points) values(?,?,?,'guest',0)");
 			pst.setString(1, username);
 			pst.setString(2, uemail);
 			pst.setString(3, upass);
@@ -512,6 +511,11 @@ public class AccountHandler extends HttpServlet {
 				session.setAttribute("name", rs.getString("user_name"));
 				session.setAttribute("email", rs.getString("email_id"));
 				session.setAttribute("type", rs.getString("type"));
+				
+				//Display user points on login on index
+				int guestPoints = rs.getInt("points");
+				session.setAttribute("guestPoints", guestPoints);
+				
 				dispatcher = request.getRequestDispatcher("index.jsp");
 			}
 			else
