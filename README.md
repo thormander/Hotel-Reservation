@@ -1,5 +1,5 @@
 # Hotel-Reservation
-### Project Requirements:
+## Project Requirements:
 - As a hotel guest:
   - Create a guest account, and log in/log out.
   - Modify their own guest account.
@@ -22,8 +22,24 @@
   - Hotel guest membership with points earning/redeem system.
   - Email notification system.
 
-### Technologies Used:
+## Technologies Used:
 - Database: [mySQL](https://www.mysql.com/products/workbench/)
 - Server: [Apache Tomcat 10.1](https://tomcat.apache.org/download-10.cgi): Under Core -> 'zip' option
 - IDE: [Eclipse EE](https://www.eclipse.org/downloads/packages/release/2023-03/r/eclipse-ide-enterprise-java-and-web-developers)
 - Tests: JUnit 5
+
+### Tomcat 10.1 Server Installation:
+- Before creating/importing a new project, you must add tomcat to the servers list
+- After downloading the zip for Apache Tomcat from linked website above ('zip' option under Core), extract the folder
+- Store this folder where you like, and click on 'Servers' which shoud be tiled at the bottom window of eclipse
+- Select 'No servers are available. Click this link to create a new server...'
+- Click on 'Apache' and scroll through the options until you find 'Tomcat v10.1 Server'; Select it and hit next
+- Under 'Tomcaat installation directory:' hit browse and select the unzipped Tomcat folder previously downloaded and hit finish
+- Right click on the new server and hit 'Start'; The server should now be Started and running.
+### Project Setup:
+- Select 'Create a Dyanmic Web Project' (this should be seen, if not please download eclipse EE)
+- Name the project and make sure 'Target runtime' has Apache Tomcat v10.1 selected. 
+- Generate a web.xml, and hit 'Finish'
+- (I have tried directly importing the project, but eclipse does not recoginze any of the files when it is done this way)
+- Copy the files from the repository and paste it into the newly created project.
+- Right click on the project name in 'Project Explorer' and hit run
