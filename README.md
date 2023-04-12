@@ -41,5 +41,5 @@
 - Name the project and make sure 'Target runtime' has Apache Tomcat v10.1 selected. 
 - Generate a web.xml, and hit 'Finish'
 - (I have tried directly importing the project, but eclipse does not recoginze any of the files when it is done this way)
-- Copy the files from the repository and paste it into the newly created project.
+- Copy the files from the repository and paste it into the newly created project. (Just select the contents and paste it into the project folder)
 - Right click on the project name in 'Project Explorer' and hit run
