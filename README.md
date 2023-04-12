@@ -28,6 +28,7 @@
 - IDE: [Eclipse EE](https://www.eclipse.org/downloads/packages/release/2023-03/r/eclipse-ide-enterprise-java-and-web-developers)
 - Tests: JUnit 5
 
+## Installation
 ### Tomcat 10.1 Server Installation:
 - Before creating/importing a new project, you must add tomcat to the servers list
 - After downloading the zip for Apache Tomcat from linked website above ('zip' option under Core), extract the folder
@@ -42,4 +43,5 @@
 - Generate a web.xml, and hit 'Finish'
 - (I have tried directly importing the project, but eclipse does not recoginze any of the files when it is done this way)
 - Copy the files from the repository and paste it into the newly created project. (Just select the contents and paste it into the project folder)
-- Right click on the project name in 'Project Explorer' and hit run
+- Right click on the project name in 'Project Explorer' and hover over 'Run' then click on 'Run on Server'
+- Select Tomcat and hit finish. A new window should now pop up with the website loaded
