@@ -48,5 +48,6 @@
 - Select Tomcat and hit finish. A new window should now pop up with the website loaded
 ### Troubleshooting:
 - If you right click on the project hover over 'Run On', and it does not show 'Run on Server'; You need to change to version of your Dynamic Web Module.
+https://user-images.githubusercontent.com/71967190/231577937-123e9b52-ddec-499a-9cab-16f4f0c6b6f9.mov
 
-https://i.imgur.com/QA891In.mp4
+
