@@ -35,7 +35,7 @@
 - Store this folder where you like, and click on 'Servers' which shoud be tiled at the bottom window of eclipse
 - Select 'No servers are available. Click this link to create a new server...'
 - Click on 'Apache' and scroll through the options until you find 'Tomcat v10.1 Server'; Select it and hit next
-- Under 'Tomcaat installation directory:' hit browse and select the unzipped Tomcat folder previously downloaded and hit finish
+- Under 'Tomcat installation directory:' hit browse and select the unzipped Tomcat folder previously downloaded and hit finish
 
 https://user-images.githubusercontent.com/71967190/231578521-df3b2076-b767-4a54-9a8f-da0a570c1a12.mov
 
