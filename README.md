@@ -42,7 +42,7 @@ https://user-images.githubusercontent.com/71967190/231578521-df3b2076-b767-4a54-
 
 - Right click on the new server and hit 'Start'; The server should now be Started and running.
 ### Project Setup:
-- Select 'Create a Dyanmic Web Project' (this should be seen, if not please download eclipse EE)
+- Select 'Create a Dynamic Web Project' (this should be seen, if not please download eclipse EE)
 - Name the project and make sure 'Target runtime' has Apache Tomcat v10.1 selected. Select '5.0' for Dynamic Web Module
 - Generate a web.xml, and hit 'Finish'
 
@@ -60,7 +60,7 @@ https://user-images.githubusercontent.com/71967190/231578675-f542a1ab-8227-4ded-
 - Right click on the project name in 'Project Explorer' and hover over 'Run' then click on 'Run on Server'
 - Select Tomcat and hit finish. A new window should now pop up with the website loaded
 ### Troubleshooting:
-- If you right click on the project hover over 'Run On', and it does not show 'Run on Server'; You need to change to version of your Dynamic Web Module.
+- If you right click on the project hover over 'Run On', and it does not show 'Run on Server'; You need to change the version of your Dynamic Web Module.
 
 https://user-images.githubusercontent.com/71967190/231577937-123e9b52-ddec-499a-9cab-16f4f0c6b6f9.mov
 
