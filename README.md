@@ -39,6 +39,7 @@
 
 https://user-images.githubusercontent.com/71967190/231578521-df3b2076-b767-4a54-9a8f-da0a570c1a12.mov
 
+
 - Right click on the new server and hit 'Start'; The server should now be Started and running.
 ### Project Setup:
 - Select 'Create a Dyanmic Web Project' (this should be seen, if not please download eclipse EE)
@@ -47,12 +48,14 @@ https://user-images.githubusercontent.com/71967190/231578521-df3b2076-b767-4a54-
 
 https://user-images.githubusercontent.com/71967190/231578675-f542a1ab-8227-4ded-9555-55e2ec9a4005.mov
 
+
 - (I have tried directly importing the project, but eclipse does not recoginze any of the files when it is done this way)
 - Copy the files from the repository and paste it into the newly created project. (Just select the contents and paste it into the project folder)
   - If Junit 5 is not installed yet, add it to the library by right clicking on project -> 'Build Path' -> 'Configure Build path'
   - Go to 'Libraries' -> click on 'Classpath' -> 'Add Library...' -> 'Junit 5'
   
   https://user-images.githubusercontent.com/71967190/231580148-7e22b0e1-12fb-4f41-90f6-9e0429771a96.mov
+
 
 - Right click on the project name in 'Project Explorer' and hover over 'Run' then click on 'Run on Server'
 - Select Tomcat and hit finish. A new window should now pop up with the website loaded
