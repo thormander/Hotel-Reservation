@@ -43,5 +43,6 @@
 - Generate a web.xml, and hit 'Finish'
 - (I have tried directly importing the project, but eclipse does not recoginze any of the files when it is done this way)
 - Copy the files from the repository and paste it into the newly created project. (Just select the contents and paste it into the project folder)
+  - If Junit 5 is not installed yet, go ahead and configure it.
 - Right click on the project name in 'Project Explorer' and hover over 'Run' then click on 'Run on Server'
 - Select Tomcat and hit finish. A new window should now pop up with the website loaded
