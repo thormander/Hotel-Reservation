@@ -39,10 +39,14 @@
 - Right click on the new server and hit 'Start'; The server should now be Started and running.
 ### Project Setup:
 - Select 'Create a Dyanmic Web Project' (this should be seen, if not please download eclipse EE)
-- Name the project and make sure 'Target runtime' has Apache Tomcat v10.1 selected. 
+- Name the project and make sure 'Target runtime' has Apache Tomcat v10.1 selected. Select '5.0' for Dynamic Web Module
 - Generate a web.xml, and hit 'Finish'
 - (I have tried directly importing the project, but eclipse does not recoginze any of the files when it is done this way)
 - Copy the files from the repository and paste it into the newly created project. (Just select the contents and paste it into the project folder)
   - If Junit 5 is not installed yet, go ahead and configure it.
 - Right click on the project name in 'Project Explorer' and hover over 'Run' then click on 'Run on Server'
 - Select Tomcat and hit finish. A new window should now pop up with the website loaded
+### Troubleshooting:
+- If you right click on the project hover over 'Run On', and it does not show 'Run on Server'; You need to change to version of your Dynamic Web Module.
+
+https://i.imgur.com/QA891In.mp4
