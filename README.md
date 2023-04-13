@@ -29,6 +29,21 @@
 - Tests: JUnit 5
 
 ## Installation
+### MySQL:
+- Ensure the name of the admin user is 'root' and the password is '12345678'
+- [Mac Installation Tutorial](https://www.youtube.com/watch?v=nj3nBCwZaqI&t=237s)
+  - If you are using MySQL workbench and it repeatedly crashes, downgrade to the previous version [8.0.31](https://downloads.mysql.com/archives/workbench/)
+- [Windows Installation Tutorial](https://www.youtube.com/watch?v=u96rVINbAUI&t=97s)
+- Run the following commands in mySQL: 
+  - `CREATE DATABASE hotel;`
+  - ```
+  USE hotel;
+  INSERT INTO `hotel`.`account` (`user_name`, `email_id`, `password`, `type`) VALUES ('admin', 'admin@test.com', 'admin', 'admin');
+  ```
+- Run the following commands from the .txt files below in order:
+  - [SqlCreate.txt](https://github.com/thormander/Hotel-Reservation/files/11224437/SqlCreate.txt)
+  - [40roomsINSERT.txt](https://github.com/thormander/Hotel-Reservation/files/11224624/40roomsINSERT.txt)
+
 ### Tomcat 10.1 Server Installation:
 - Before creating/importing a new project, you must add tomcat to the servers list
 - After downloading the zip for Apache Tomcat from linked website above ('zip' option under Core), extract the folder
