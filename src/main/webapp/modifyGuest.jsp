@@ -26,6 +26,9 @@
 				<div class="signup-content">
 					<div class="signup-form">
 						<h2 class="form-title">Modify Account</h2>
+						<% if(request.getAttribute("modifySuccess") != null && request.getAttribute("modifySuccess").equals("true")) { %>
+						    <p class="success-message">Password modified!</p>
+						<% } %>
 						<form method="post" action="accountHandler">
 						<input type="hidden" name="accountType" value="modifyGuest">
 							<div class="form-group">

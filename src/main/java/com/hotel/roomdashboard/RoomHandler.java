@@ -108,7 +108,7 @@ public class RoomHandler extends HttpServlet {
 		{
 			Class.forName("com.mysql.cj.jdbc.Driver");
 			//CONNECTION TO DB (change "hotel" to whatever you database name is.)
-			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=UTC","root", "1234");
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=UTC","root", "12345678");
 			
 			
 			PreparedStatement pst = con.prepareStatement("Select * from rooms");
@@ -147,7 +147,7 @@ public class RoomHandler extends HttpServlet {
 		try 
 		{
 			Class.forName("com.mysql.cj.jdbc.Driver");
-			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=UTC","root", "1234");
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=UTC","root", "12345678");
 			PreparedStatement pst = con.prepareStatement("SELECT * FROM rooms WHERE id = ?");
 
 			pst.setInt(1, id);
@@ -182,7 +182,7 @@ public class RoomHandler extends HttpServlet {
 		try 
 		{
 			Class.forName("com.mysql.cj.jdbc.Driver");
-			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=UTC","root", "1234");
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=UTC","root", "12345678");
 			PreparedStatement pst = con.prepareStatement("UPDATE rooms SET bedSize=?,smoking=?,amountBeds=?,quality=?,roomInformation=? WHERE id=?");
 
 			pst.setString(1, room.getBedSize());

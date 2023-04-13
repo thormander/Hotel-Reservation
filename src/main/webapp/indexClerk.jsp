@@ -21,6 +21,14 @@
 	<a href="modifyClerk.jsp">Modify Account?</a>
 	<h1>Clerk Dashboard</h1>
 	<a href="roomList.jsp">Access Room List</a>
+	<div>
+		<h3>View Reservations</h3>
+		<form action="reservationHandler" method="post">
+			<input type="hidden" name="reservationStep" value="clerkViewReservations">
+			<button type="submit">View Reservations</button>
+		</form>
+	</div>
+	
 	
 	<div>
 		<h2>Checkout Guest</h2>
@@ -41,7 +49,7 @@
 		</form>
 	</div>
 	<br>
-
+	<br>
 
 	<form action="accountHandler" method="post">
 		<input type="hidden" name="accountType" value="logout">

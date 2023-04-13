@@ -1,43 +1,52 @@
 package tests.account;
 
+import java.util.List;
+import java.util.ArrayList;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.NameValuePair;
+import org.apache.http.util.EntityUtils;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import org.apache.http.client.methods.HttpPost;
 
-import com.hotel.Account.AccountHandler;
-
-import jakarta.servlet.RequestDispatcher;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class Modify_Guest {
 
     @Test
     public void testModifyGuest_SuccessfulModify() throws Exception {
-        // create mock request and response objects (mocking to simulate server requests/responses)
-        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-        HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
-        RequestDispatcher dispatcher = Mockito.mock(RequestDispatcher.class);
+        // Create a new HttpClient instance
+        HttpClient httpClient = HttpClients.createDefault();
 
-        // set the request parameters for a successful modification
-        Mockito.when(request.getParameter("pass")).thenReturn("passModifyTest");
-        Mockito.when(request.getParameter("name")).thenReturn("Firstname Lastname");
-        Mockito.when(request.getParameter("email")).thenReturn("unitTestGuest@test.com"); //NOTE -> Even if you take out '@test.com' this will still be seen as successful as we do error checking through html
-        Mockito.when(request.getParameter("passOld")).thenReturn("passwordTest");
+        // URL pathing as if you were on the webpage
+        String url = "http://localhost:8080/hotelMain/accountHandler";
 
-        // mock the request dispatcher to capture the forwarded request
-        Mockito.when(request.getRequestDispatcher(Mockito.anyString())).thenReturn(dispatcher);
+        // HTTP POST request
+        HttpPost httpPost = new HttpPost(url);
+        httpPost.setHeader("Content-Type", "application/x-www-form-urlencoded");
 
-        // create a new AccountHandler instance and call the registerClerk method
-        AccountHandler accountHandler = new AccountHandler();
-        accountHandler.modifyGuest(request, response);
+        // Set the request parameters
+        List<NameValuePair> params = new ArrayList<>();
+        params.add(new BasicNameValuePair("accountType", "modifyGuest"));
+        params.add(new BasicNameValuePair("pass", "new"));
+        params.add(new BasicNameValuePair("name", "Firstname Lastname"));
+        params.add(new BasicNameValuePair("email", "testGuestModify@test.com"));
+        params.add(new BasicNameValuePair("passOld", "old"));
+        httpPost.setEntity(new UrlEncodedFormEntity(params));
 
-        // verify that the status attribute was set to "success"
-        Mockito.verify(request).setAttribute("status", "success");
+        HttpResponse response = httpClient.execute(httpPost);
+        String responseBody = EntityUtils.toString(response.getEntity());
+
+        // Check for success attribute
+        assertTrue(response.getStatusLine().getStatusCode() == 200);
+        assertTrue(responseBody.contains("Modify Account"));
     }
 
 }
 /*ON SUCCESS: Function is being properly executed and passed through
  *ON FAILURE: Function broke out of try loop due to a error
  * */
-
-//It should still pass test even if given passcode is wrong
