@@ -36,10 +36,8 @@
 - [Windows Installation Tutorial](https://www.youtube.com/watch?v=u96rVINbAUI&t=97s)
 - Run the following commands in mySQL: 
   - `CREATE DATABASE hotel;`
-  - ```
-  USE hotel;
-  INSERT INTO `hotel`.`account` (`user_name`, `email_id`, `password`, `type`) VALUES ('admin', 'admin@test.com', 'admin', 'admin');
-  ```
+  - `USE hotel;`
+  - ```INSERT INTO `hotel`.`account` (`user_name`, `email_id`, `password`, `type`) VALUES ('admin', 'admin@test.com', 'admin', 'admin');```
 - Run the following commands from the .txt files below in order:
   - [SqlCreate.txt](https://github.com/thormander/Hotel-Reservation/files/11224437/SqlCreate.txt)
   - [40roomsINSERT.txt](https://github.com/thormander/Hotel-Reservation/files/11224624/40roomsINSERT.txt)
