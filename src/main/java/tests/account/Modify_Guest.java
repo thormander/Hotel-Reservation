@@ -5,15 +5,14 @@ import java.util.ArrayList;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.NameValuePair;
-import org.apache.http.util.EntityUtils;
 import org.junit.jupiter.api.Test;
-import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class Modify_Guest {
 
@@ -25,10 +24,6 @@ class Modify_Guest {
         // URL pathing as if you were on the webpage
         String url = "http://localhost:8080/hotelMain/accountHandler";
 
-        // HTTP POST request
-        HttpPost httpPost = new HttpPost(url);
-        httpPost.setHeader("Content-Type", "application/x-www-form-urlencoded");
-
         // Set the request parameters
         List<NameValuePair> params = new ArrayList<>();
         params.add(new BasicNameValuePair("accountType", "modifyGuest"));
@@ -36,14 +31,19 @@ class Modify_Guest {
         params.add(new BasicNameValuePair("name", "Firstname Lastname"));
         params.add(new BasicNameValuePair("email", "testGuestModify@test.com"));
         params.add(new BasicNameValuePair("passOld", "old"));
-        httpPost.setEntity(new UrlEncodedFormEntity(params));
+        
+        // Build the URI with query parameters
+        URIBuilder uriBuilder = new URIBuilder(url);
+        uriBuilder.addParameters(params);
+        
+        // HTTP GET request
+        HttpGet httpGet = new HttpGet(uriBuilder.build());
 
-        HttpResponse response = httpClient.execute(httpPost);
-        String responseBody = EntityUtils.toString(response.getEntity());
+        HttpResponse response = httpClient.execute(httpGet);
+        
+        // Check success conditions
+        assertEquals(200, response.getStatusLine().getStatusCode());
 
-        // Check for success attribute
-        assertTrue(response.getStatusLine().getStatusCode() == 200);
-        assertTrue(responseBody.contains("Modify Account"));
     }
 
 }

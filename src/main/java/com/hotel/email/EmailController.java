@@ -11,7 +11,7 @@ import javax.mail.internet.MimeMessage;
 
 public class EmailController {
     private final String fromEmail = "codingninjashotel@gmail.com";
-    private final String rand = "bjb.chb@AJH!hkn0nqr";
+    private final String rand = "";
 
     public void sendRegistrationConfirmationEmail(String toEmail, String username) {
         

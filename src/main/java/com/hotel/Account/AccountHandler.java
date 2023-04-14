@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.Console;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -162,6 +163,8 @@ public class AccountHandler extends HttpServlet {
 		RequestDispatcher dispatcher = null;
 		Connection con = null;
 		
+		boolean testMode = "true".equals(request.getParameter("testMode")); //check if request from junit
+		
 		try 
 		{
 			Class.forName("com.mysql.cj.jdbc.Driver");
@@ -178,6 +181,16 @@ public class AccountHandler extends HttpServlet {
 			dispatcher = request.getRequestDispatcher("indexAdmin.jsp");
 			if (rowCount > 0)
 			{
+				// Write success response for unit test
+		        if (testMode) {
+			        PrintWriter out = response.getWriter();
+			        response.setContentType("text/plain");
+			        response.setCharacterEncoding("UTF-8");
+			        out.write("success");
+			        out.flush();
+			        out.close();
+		        }
+		        
 				request.setAttribute("status", "success");
 			}
 			else
@@ -185,7 +198,11 @@ public class AccountHandler extends HttpServlet {
 				request.setAttribute("status", "failed");
 			}
 			
-			dispatcher.forward(request, response);
+			//prevent forward if we are testing
+			if (testMode == false) {
+				dispatcher.forward(request, response);			
+			}
+
 			
 		}
 		catch (java.sql.SQLIntegrityConstraintViolationException e)
@@ -223,6 +240,8 @@ public class AccountHandler extends HttpServlet {
 		RequestDispatcher dispatcher = null;
 		Connection con = null;
 		
+		boolean testMode = "true".equals(request.getParameter("testMode")); //check if request from junit
+		
 		try 
 		{
 			Class.forName("com.mysql.cj.jdbc.Driver");
@@ -240,8 +259,16 @@ public class AccountHandler extends HttpServlet {
 			dispatcher = request.getRequestDispatcher("registration.jsp");
 			if (rowCount > 0)
 			{
-				request.setAttribute("status", "success");
-				
+				// Write success response for unit test
+		        if (testMode) {
+			        PrintWriter out = response.getWriter();
+			        response.setContentType("text/plain");
+			        response.setCharacterEncoding("UTF-8");
+			        out.write("success");
+			        out.flush();
+			        out.close();
+		        }
+		        
 			    EmailController emailController = new EmailController();
 			    emailController.sendRegistrationConfirmationEmail(uemail, username);
 			}
@@ -250,8 +277,9 @@ public class AccountHandler extends HttpServlet {
 				request.setAttribute("status", "failed");
 			}
 			
-			dispatcher.forward(request, response);
-			
+			if (testMode == false) {
+				dispatcher.forward(request, response);
+			}
 		}
 		catch (java.sql.SQLIntegrityConstraintViolationException e)
 		{
@@ -309,7 +337,8 @@ public class AccountHandler extends HttpServlet {
 			
 			pst.executeUpdate();
 			
-			request.setAttribute("status", "success"); //for unit testing
+			request.setAttribute("modifySuccess", true);			
+			request.setAttribute("message", "Password modified!");
 			
 			dispatcher = request.getRequestDispatcher("modifyClerk.jsp");
 			
@@ -364,8 +393,7 @@ public class AccountHandler extends HttpServlet {
 			
 			pst.executeUpdate();
 			
-			request.setAttribute("status", "success"); //for unit testing
-			request.setAttribute("modifySuccess", "true");
+			request.setAttribute("modifySuccess", true);			
 			request.setAttribute("message", "Password modified!");
 			
 			dispatcher = request.getRequestDispatcher("modifyGuest.jsp");

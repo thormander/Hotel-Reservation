@@ -26,7 +26,7 @@
 				<div class="signup-content">
 					<div class="signup-form">
 						<h2 class="form-title">Modify Account</h2>
-						<% if(request.getAttribute("modifySuccess") != null && request.getAttribute("modifySuccess").equals("true")) { %>
+						<% if(request.getAttribute("modifySuccess") != null && (Boolean) request.getAttribute("modifySuccess")) { %>
 						    <p class="success-message">Password modified!</p>
 						<% } %>
 						<form method="post" action="accountHandler">
@@ -38,7 +38,7 @@
 								<input type="email" name="email" id="userEmail" placeholder="Your Email" required="required"/>
 							</div>
 							<div class="form-group">
-								<input type="password" name="passOld" id="pass" placeholder="Old Password" required="required"/>
+								<input type="password" name="passOld" id="passOld" placeholder="Old Password" required="required"/>
 							</div>							
 							<div class="form-group">
 								<input type="password" name="pass" id="pass" placeholder="New Password" required="required"/>
