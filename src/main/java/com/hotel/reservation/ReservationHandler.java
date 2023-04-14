@@ -218,11 +218,34 @@ public class ReservationHandler extends HttpServlet {
 					Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=UTC","root", "12345678");
 					
 					//Fetch data for storage------------------------------------
-					String fetchQuery = "SELECT r.startDate,r.endDate,r.checkInDate,a.employer FROM reservation r JOIN account a ON(r.reservationName = a.email_id) WHERE r.reservationName = ?";
+				    //Calculate cost
+			        String costQuery = "SELECT r.durationOfStay * (CASE rm.Quality "
+			                + "                    WHEN 'Excellent' THEN 150 "
+			                + "                    WHEN 'Good' THEN 100 "
+			                + "                    WHEN 'Average' THEN 80 "
+			                + "                    WHEN 'Poor' THEN 50 "
+			                + "                    ELSE 0 "
+			                + "                    END) as amountDue "
+			                + "FROM reservation r JOIN rooms rm USING(id) WHERE r.reservationID = ?";
+					PreparedStatement pst = con.prepareStatement(costQuery);
+					pst.setString(1, reservationId);
+					ResultSet rs = pst.executeQuery();
+					double costOfStay = 0;
+					if (rs.next()) {
+						costOfStay = rs.getDouble("amountDue");
+					}
+					//Check for late fees due
+					PreparedStatement pstLateStorage = con.prepareStatement("SELECT * FROM reservation WHERE reservationID=? AND checkInDate > startDate;");
+					pstLateStorage.setString(1, reservationId);
+					ResultSet rsLateStorage = pstLateStorage.executeQuery();
+					if (rsLateStorage.next()) {
+						costOfStay += 50; //add 50 dollar late fee
+					}
+					String fetchQuery = "SELECT r.startDate,r.endDate,r.checkInDate,a.employer FROM reservation r JOIN account a ON(r.reservationName = a.email_id) WHERE r.reservationName = ? AND r.reservationID = ?";
 					PreparedStatement pstStorageFetch = con.prepareStatement(fetchQuery);
 					pstStorageFetch.setString(1, guestEmail);
-					ResultSet storageFetchQuery = pstStorageFetch.executeQuery();
-				    
+					pstStorageFetch.setString(2, reservationId);
+					ResultSet storageFetchQuery = pstStorageFetch.executeQuery();	
 				    if (storageFetchQuery.next()) {
 						// Calculate the duration in days
 					    java.sql.Date startDate = storageFetchQuery.getDate("startDate");
@@ -231,7 +254,7 @@ public class ReservationHandler extends HttpServlet {
 					    int durationInDays = (int) TimeUnit.DAYS.convert(durationInMillis, TimeUnit.MILLISECONDS);
 				    	
 				    	//Insert data to storage
-						PreparedStatement pstStorage = con.prepareStatement("INSERT INTO storage(reservationID,startDate,endDate,checkInDate,guest_email,employer,durationOfStay) values(?,?,?,?,?,?,?)");
+						PreparedStatement pstStorage = con.prepareStatement("INSERT INTO storage(reservationID,startDate,endDate,checkInDate,guest_email,employer,durationOfStay,costOfStay) values(?,?,?,?,?,?,?,?)");
 						pstStorage.setString(1,reservationId);
 						pstStorage.setDate(2,storageFetchQuery.getDate("startDate"));
 						pstStorage.setDate(3,storageFetchQuery.getDate("endDate"));
@@ -239,15 +262,16 @@ public class ReservationHandler extends HttpServlet {
 						pstStorage.setString(5,guestEmail);
 						pstStorage.setString(6,storageFetchQuery.getString("employer"));
 						pstStorage.setInt(7,durationInDays);
+						pstStorage.setDouble(8,costOfStay);
 						pstStorage.execute();
 						System.out.println("Data Saved to storage!");
 					}
 					// ---------------------------------------------------------
 					
-					PreparedStatement pst = con.prepareStatement("DELETE FROM reservation WHERE reservationID = ?");				
+					PreparedStatement pst1 = con.prepareStatement("DELETE FROM reservation WHERE reservationID = ?");				
 					
-					pst.setString(1, reservationId);
-					pst.executeUpdate();
+					pst1.setString(1, reservationId);
+					pst1.executeUpdate();
 					
 					//Fetch current points and add 1 point to the guest account---
 					PreparedStatement pstPoints = con.prepareStatement("SELECT points FROM account WHERE email_id = ?");
@@ -286,11 +310,34 @@ public class ReservationHandler extends HttpServlet {
 					
 					
 					//Fetch data for storage------------------------------------
-					String fetchQuery = "SELECT r.startDate,r.endDate,r.checkInDate,a.employer FROM reservation r JOIN account a ON(r.reservationName = a.email_id) WHERE r.reservationName = ?";
+				    //Calculate cost
+			        String costQuery = "SELECT r.durationOfStay * (CASE rm.Quality "
+			                + "                    WHEN 'Excellent' THEN 150 "
+			                + "                    WHEN 'Good' THEN 100 "
+			                + "                    WHEN 'Average' THEN 80 "
+			                + "                    WHEN 'Poor' THEN 50 "
+			                + "                    ELSE 0 "
+			                + "                    END) as amountDue "
+			                + "FROM reservation r JOIN rooms rm USING(id) WHERE r.reservationID = ?";
+					PreparedStatement pst = con.prepareStatement(costQuery);
+					pst.setString(1, reservationId);
+					ResultSet rs = pst.executeQuery();
+					double costOfStay = 0;
+					if (rs.next()) {
+						costOfStay = rs.getDouble("amountDue");
+					}
+					//Check for late fees due
+					PreparedStatement pstLateStorage = con.prepareStatement("SELECT * FROM reservation WHERE reservationID=? AND checkInDate > startDate;");
+					pstLateStorage.setString(1, reservationId);
+					ResultSet rsLateStorage = pstLateStorage.executeQuery();
+					if (rsLateStorage.next()) {
+						costOfStay += 50; //add 50 dollar late fee
+					}
+					String fetchQuery = "SELECT r.startDate,r.endDate,r.checkInDate,a.employer FROM reservation r JOIN account a ON(r.reservationName = a.email_id) WHERE r.reservationName = ? AND r.reservationID = ?";
 					PreparedStatement pstStorageFetch = con.prepareStatement(fetchQuery);
 					pstStorageFetch.setString(1, guestEmail);
-					ResultSet storageFetchQuery = pstStorageFetch.executeQuery();
-				    
+					pstStorageFetch.setString(2, reservationId);
+					ResultSet storageFetchQuery = pstStorageFetch.executeQuery();	
 				    if (storageFetchQuery.next()) {
 						// Calculate the duration in days
 					    java.sql.Date startDate = storageFetchQuery.getDate("startDate");
@@ -299,7 +346,7 @@ public class ReservationHandler extends HttpServlet {
 					    int durationInDays = (int) TimeUnit.DAYS.convert(durationInMillis, TimeUnit.MILLISECONDS);
 				    	
 				    	//Insert data to storage
-						PreparedStatement pstStorage = con.prepareStatement("INSERT INTO storage(reservationID,startDate,endDate,checkInDate,guest_email,employer,durationOfStay) values(?,?,?,?,?,?,?)");
+						PreparedStatement pstStorage = con.prepareStatement("INSERT INTO storage(reservationID,startDate,endDate,checkInDate,guest_email,employer,durationOfStay,costOfStay) values(?,?,?,?,?,?,?,?)");
 						pstStorage.setString(1,reservationId);
 						pstStorage.setDate(2,storageFetchQuery.getDate("startDate"));
 						pstStorage.setDate(3,storageFetchQuery.getDate("endDate"));
@@ -307,15 +354,16 @@ public class ReservationHandler extends HttpServlet {
 						pstStorage.setString(5,guestEmail);
 						pstStorage.setString(6,storageFetchQuery.getString("employer"));
 						pstStorage.setInt(7,durationInDays);
+						pstStorage.setDouble(8,costOfStay);
 						pstStorage.execute();
 						System.out.println("Data Saved to storage!");
 					}
 					// ---------------------------------------------------------
 					
 					
-					PreparedStatement pst = con.prepareStatement("DELETE FROM reservation WHERE reservationID = ?");				
-					pst.setString(1, reservationId);
-					pst.executeUpdate();
+					PreparedStatement pst1 = con.prepareStatement("DELETE FROM reservation WHERE reservationID = ?");				
+					pst1.setString(1, reservationId);
+					pst1.executeUpdate();
 					
 					
 					//Fetch current points and add 1 point to the guest account---
@@ -379,6 +427,14 @@ public class ReservationHandler extends HttpServlet {
 					    amountDue = rs.getDouble("amountDue");
 					}
 					
+					//Check for late fees due
+					PreparedStatement pstLate = con.prepareStatement("SELECT * FROM reservation WHERE reservationID=? AND checkInDate > startDate;");
+					pstLate.setString(1, reservationId);
+					ResultSet rsLate = pstLate.executeQuery();
+					if (rsLate.next()) {
+						amountDue += 50; //add 50 dollar late fee
+					}
+					
 				    //Get the company name that the guest works for
 				    PreparedStatement pst2 = con.prepareStatement("SELECT employer FROM account WHERE email_id = ?");
 				    pst2.setString(1, guestEmail);
@@ -423,6 +479,15 @@ public class ReservationHandler extends HttpServlet {
 					if (rs.next()) {
 					    amountDue = rs.getDouble("amountDue");
 					}
+					
+					//Check for late fees due
+					PreparedStatement pstLate = con.prepareStatement("SELECT * FROM reservation WHERE reservationID=? AND checkInDate > startDate;");
+					pstLate.setString(1, reservationId);
+					ResultSet rsLate = pstLate.executeQuery();
+					if (rsLate.next()) {
+						amountDue += 50; //add 50 dollar late fee
+					}
+					
 					request.setAttribute("amountDue", amountDue);
 					request.setAttribute("guestType", "regular"); // Forward the guestType
 					

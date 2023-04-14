@@ -10,8 +10,8 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 public class EmailController {
-    private final String fromEmail = "codingninjashotel@gmail.com"; // hotel email address
-    private final String emailPassword = "iceqnilpdidqoygo"; // hotel email password
+    private final String fromEmail = "codingninjashotel@gmail.com";
+    private final String rand = "bjb.chb@AJH!hkn0nqr";
 
     public void sendRegistrationConfirmationEmail(String toEmail, String username) {
         
@@ -27,7 +27,7 @@ public class EmailController {
         Session session = Session.getInstance(properties,
             new javax.mail.Authenticator() {
                 protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication(fromEmail, emailPassword);
+                    return new PasswordAuthentication(fromEmail, rand);
                 }
             });
 
@@ -58,7 +58,7 @@ public class EmailController {
         Session session = Session.getInstance(properties,
             new javax.mail.Authenticator() {
                 protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication(fromEmail, emailPassword);
+                    return new PasswordAuthentication(fromEmail, rand);
                 }
             });
 
