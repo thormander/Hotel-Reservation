@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -518,6 +519,8 @@ public class ReservationHandler extends HttpServlet {
 		HttpSession session = request.getSession();
 		RequestDispatcher dispatcher = null;
 		
+		boolean testMode = "true".equals(request.getParameter("testMode")); //check if request from junit
+		
 		if (dates == "" ) {
 
 			try 
@@ -580,10 +583,21 @@ public class ReservationHandler extends HttpServlet {
 				request.setAttribute("rs", myList);
 				
 				dispatcher = request.getRequestDispatcher("availableRoomList.jsp");
-	
-				dispatcher.forward(request, response);
 				
-				request.setAttribute("status", "success"); //for unit testing
+				// Write success response for unit test
+		        if (testMode) {
+			        PrintWriter out = response.getWriter();
+			        response.setContentType("text/plain");
+			        response.setCharacterEncoding("UTF-8");
+			        out.write("success");
+			        out.flush();
+			        out.close();
+		        }
+				
+				if (testMode == false) {
+					dispatcher.forward(request, response);
+				}
+				
 				
 			} catch (Exception e)
 			{
@@ -604,6 +618,11 @@ public class ReservationHandler extends HttpServlet {
 		HttpSession session = request.getSession();
 		RequestDispatcher dispatcher = null;
 		
+		boolean testMode = "true".equals(request.getParameter("testMode")); //check if request from junit
+		
+
+
+		
 		try 
 		{
 			Class.forName("com.mysql.cj.jdbc.Driver");
@@ -612,11 +631,24 @@ public class ReservationHandler extends HttpServlet {
 			
 			//Call the reservation Catalog and room catalog.
 			PreparedStatement pst = con.prepareStatement("Insert into reservation (id,startDate,endDate,reservationName,accountType,isCheckedIn,durationOfStay) values (?,?,?,?,?,'0',?)");
-		
-			String startDate = (String) session.getAttribute("startDate");
-			String endDate = (String) session.getAttribute("endDate");
-			String reservationName = (String) session.getAttribute("email");
-			String accountType = (String) session.getAttribute("type");
+			
+			//Because we are retrieving from session, we need to create separate 
+			//variables to retrieve from a request parameter for the junit test
+			String startDate;
+			String endDate;
+			String reservationName;
+			String accountType;
+			if (testMode) {
+			    startDate = request.getParameter("startDate");
+			    endDate = request.getParameter("endDate");
+			    reservationName = request.getParameter("email");
+			    accountType = request.getParameter("type");
+			} else {
+				startDate = (String) session.getAttribute("startDate");
+				endDate = (String) session.getAttribute("endDate");
+				reservationName = (String) session.getAttribute("email");
+				accountType = (String) session.getAttribute("type");	
+			}
 			
 			// Calculate the duration in days
 	        LocalDate startLocalDate = LocalDate.parse(startDate);
@@ -632,6 +664,16 @@ public class ReservationHandler extends HttpServlet {
 			
 			pst.executeUpdate();
 			
+			// Write success response for unit test
+	        if (testMode) {
+		        PrintWriter out = response.getWriter();
+		        response.setContentType("text/plain");
+		        response.setCharacterEncoding("UTF-8");
+		        out.write("success");
+		        out.flush();
+		        out.close();
+	        }
+			
 			Reservation reservation = new Reservation();
 			reservation.setId(id);
 			reservation.setStartDate(startDate);
@@ -642,9 +684,9 @@ public class ReservationHandler extends HttpServlet {
 			request.setAttribute("ri", reservation);
 			
 			dispatcher = request.getRequestDispatcher("reservationConfirmation.jsp");
-			dispatcher.forward(request, response);
-			
-			request.setAttribute("status", "success"); //for unit testing
+			if (testMode == false) {
+				dispatcher.forward(request, response);			
+			}
 			
 		} catch (Exception e)
 		{
@@ -661,13 +703,34 @@ public class ReservationHandler extends HttpServlet {
 	
 	public void deleteReservations(HttpServletRequest request, HttpServletResponse response, String deleteParams) {
 		HttpSession session = request.getSession();
-		String currentUser = (String) session.getAttribute("email");
-		String accountType = (String) session.getAttribute("type");
-		System.out.println("Account type: " + accountType);
 		RequestDispatcher dispatcher = null;
+		
+		boolean testMode = "true".equals(request.getParameter("testMode")); //check if request from junit
+		
+		//Because we are retrieving from session, we need to create separate 
+		//variables to retrieve from a request parameter for the junit test
+		String currentUser;
+		String accountType;
+		if (testMode) {
+		    currentUser = request.getParameter("email");
+		    accountType = request.getParameter("type");
+
+		} else {
+			currentUser = (String) session.getAttribute("email");
+			accountType = (String) session.getAttribute("type");
+			System.out.println("Account type: " + accountType);
+		}
+
 		try 
 		{
-			int reservation_id =  Integer.parseInt(deleteParams);
+			int reservation_id;
+			if (testMode) {
+				reservation_id = Integer.parseInt(request.getParameter("deleteParams"));
+			} else {
+				reservation_id =  Integer.parseInt(deleteParams);			
+			}
+			
+
 
 			Connection con = null;
 			Class.forName("com.mysql.cj.jdbc.Driver");
@@ -675,12 +738,22 @@ public class ReservationHandler extends HttpServlet {
 			
 			
 			PreparedStatement reservationDelete = con.prepareStatement("DELETE FROM reservation WHERE reservationID = ?;");
-
+			
 			reservationDelete.setInt(1, reservation_id);
 			int rowsDeleted = reservationDelete.executeUpdate();
-		
-			viewMyReservations(request, response);
 			
+			// Write success response for unit test
+	        if (testMode) {
+		        PrintWriter out = response.getWriter();
+		        response.setContentType("text/plain");
+		        response.setCharacterEncoding("UTF-8");
+		        out.write("success");
+		        out.flush();
+		        out.close();
+	        }
+			if (testMode == false) {
+				viewMyReservations(request, response);
+			}
 		} catch (Exception e)
 		{
 			e.printStackTrace();

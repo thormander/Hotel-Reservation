@@ -1,44 +1,48 @@
 package tests.reservation;
 
-import static org.mockito.Mockito.mock;
-
-import java.io.IOException;
-
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.RequestDispatcher;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.List;
 
-import com.hotel.reservation.ReservationHandler;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class Delete_Reservation {
 
-
     @Test
     public void testDeleteReservations() throws Exception {
-    	// Mock required objects
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        HttpServletResponse response = mock(HttpServletResponse.class);
-        HttpSession session = mock(HttpSession.class);
-        RequestDispatcher dispatcher = mock(RequestDispatcher.class);
-
-        // Set up mock behavior
-        Mockito.when(request.getSession()).thenReturn(session);
-        Mockito.when(session.getAttribute("email")).thenReturn("test@test.com");
-        Mockito.when(session.getAttribute("type")).thenReturn("user");
-        Mockito.when(request.getRequestDispatcher("viewReservations.jsp")).thenReturn(dispatcher);
-        Mockito.when(request.getParameter("deleteParams")).thenReturn("1");
-
-  
+    	// Create a new HttpClient instance
+    	HttpClient httpClient = HttpClients.createDefault();
         
-	    ReservationHandler reservationHandler = new ReservationHandler();
-	    reservationHandler.deleteReservations(request, response, "1");
+    	//Pathing
+    	String url = "http://localhost:8080/hotelMain/reservationHandler";
+        
+        // HTTP POST request
+        HttpPost httpPost = new HttpPost(url);
+        httpPost.setHeader("Content-Type", "application/x-www-form-urlencoded");
 
-        // verify that the status attribute was set to "success"
-        Mockito.verify(request).setAttribute(Mockito.eq("status"), Mockito.eq("success"));
+        List<NameValuePair> params = new ArrayList<>();
+        params.add(new BasicNameValuePair("reservationStep", "deleteReservation"));
+        params.add(new BasicNameValuePair("email", "junitTest@test.com"));
+        params.add(new BasicNameValuePair("type", "junittest"));
+        params.add(new BasicNameValuePair("deleteParams", "37")); //change ID here to match test reservation case you want to delete
+        params.add(new BasicNameValuePair("testMode", "true"));
+        httpPost.setEntity(new UrlEncodedFormEntity(params));
+
+        HttpResponse response = httpClient.execute(httpPost);
+        String responseBody = EntityUtils.toString(response.getEntity());
+        
+        // Check success conditions
+        assertEquals(200, response.getStatusLine().getStatusCode());
+        assertTrue(responseBody.contains("success"));
     }
 }

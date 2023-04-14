@@ -1,48 +1,52 @@
 package tests.reservation;
 
-import static org.mockito.Mockito.mock;
-
-import java.io.IOException;
-
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.RequestDispatcher;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.List;
 
-
-import com.hotel.reservation.ReservationHandler;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class Create_Reservation {
     
 	@Test
-    public void testCreateReservation() throws ServletException, IOException, ClassNotFoundException {
+    public void testCreateReservation() throws Exception, ClassNotFoundException {
+        // Create a new HttpClient instance
+        HttpClient httpClient = HttpClients.createDefault();
 
-        // Mock required objects
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        HttpServletResponse response = mock(HttpServletResponse.class);
-        HttpSession session = mock(HttpSession.class);
-        RequestDispatcher dispatcher = mock(RequestDispatcher.class);
+        // URL pathing as if you were on the webpage
+        String url = "http://localhost:8080/hotelMain/reservationHandler";
 
-        // Define behavior for mocked objects
-        Mockito.when(request.getParameter("roomId")).thenReturn("9999");
-        Mockito.when(request.getSession()).thenReturn(session);
-        Mockito.when(session.getAttribute("startDate")).thenReturn("9999-04-10");
-        Mockito.when(session.getAttribute("endDate")).thenReturn("9999-04-15");
-        Mockito.when(session.getAttribute("email")).thenReturn("junitTest@test.com");
-        Mockito.when(session.getAttribute("type")).thenReturn("junittest");
-        Mockito.when(request.getRequestDispatcher("reservationConfirmation.jsp")).thenReturn(dispatcher);
+        // HTTP POST request
+        HttpPost httpPost = new HttpPost(url);
+        httpPost.setHeader("Content-Type", "application/x-www-form-urlencoded");
 
+        // Set the request parameters
+        List<NameValuePair> params = new ArrayList<>();
+        params.add(new BasicNameValuePair("reservationStep", "createReservation"));
+        params.add(new BasicNameValuePair("roomId", "9999"));
+        params.add(new BasicNameValuePair("startDate", "9999-04-10"));
+        params.add(new BasicNameValuePair("endDate", "9999-04-15"));
+        params.add(new BasicNameValuePair("email", "junitTest@test.com"));
+        params.add(new BasicNameValuePair("type", "junittest"));
+        params.add(new BasicNameValuePair("testMode", "true"));
+        httpPost.setEntity(new UrlEncodedFormEntity(params));
+
+        HttpResponse response = httpClient.execute(httpPost);
+        String responseBody = EntityUtils.toString(response.getEntity());
         
-        
-	    ReservationHandler reservationHandler = new ReservationHandler();
-	    reservationHandler.CreateReservation(request, response);
-
-        // verify that the status attribute was set to "success"
-        Mockito.verify(request).setAttribute(Mockito.eq("status"), Mockito.eq("success"));
+        // Check success conditions
+        assertEquals(200, response.getStatusLine().getStatusCode());
+        assertTrue(responseBody.contains("success"));
 
     }	
 
