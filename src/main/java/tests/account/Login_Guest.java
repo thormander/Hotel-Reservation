@@ -35,3 +35,11 @@ class Login_Guest {
 /* ON SUCCESS: this means test case received the 'success' from the method for a normal execution of the function (and user is present on database)
  * ON FAIL: means the login credentials were not in the correct format
  * */
+
+
+
+
+/* Please add these queries to the DB so the login functionality can be tested
+INSERT INTO `hotel`.`account` (`user_name`, `email_id`, `password`, `type`) VALUES ('junitGuestLogin', 'loginTestGuest@test.com', 'passwordTest', 'guest');
+INSERT INTO `hotel`.`account` (`user_name`, `email_id`, `password`, `type`) VALUES ('junitClerkLogin', 'loginTestClerk@test.com', 'passwordTest', 'clerk');
+ */

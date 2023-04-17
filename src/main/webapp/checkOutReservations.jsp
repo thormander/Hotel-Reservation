@@ -26,7 +26,7 @@ function submitForm(actionValue, reservationId) {
 <a href="indexClerk.jsp">Return to Clerk Dashboard</a>
 <h1>Checkout</h1>
         <form method="post" action="reservationHandler" id="reservationForm">
-        <input type="hidden" name="reservationStep" value="checkOutConfirm">
+        <input type="hidden" name="reservationAction" value="checkOutConfirm">
         <input type="hidden" id="actionType" name="actionType" value="">
         <input type="hidden" id="reservationId" name="reservationId" value="">
             <div>

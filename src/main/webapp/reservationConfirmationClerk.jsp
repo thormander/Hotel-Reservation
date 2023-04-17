@@ -15,7 +15,7 @@
 
 <!------------------------------------------------------------------------------------------------------------------->
 <body>
-	<h1>Reservation Confirmed!</h1>
+	<h1>Guest Reservation Confirmed!</h1>
 	
 	<table border = "1">
 		<thead>
@@ -38,8 +38,8 @@
 				</tr>
 		</tbody>
 	</table>
-	<a href="searchRooms.jsp">Create another reservation?</a>
-	<a href="index.jsp">Back to account home?</a>
+	<a href="searchRoomsClerk.jsp">Create another reservation?</a>
+	<a href="searchGuest.jsp">Go back to dashboard?</a>
 </body>
 
 

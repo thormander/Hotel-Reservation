@@ -23,6 +23,8 @@ import java.util.concurrent.TimeUnit;
 import java.sql.SQLException;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.text.SimpleDateFormat;
 import java.time.temporal.ChronoUnit;
 
 import com.hotel.Account.Account;
@@ -38,7 +40,7 @@ public class ReservationHandler extends HttpServlet {
        
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
-		String reservationStep = request.getParameter("reservationStep");
+		String reservationAction = request.getParameter("reservationAction");
 		String editButton = request.getParameter("editReservation");
 		String deleteButton = request.getParameter("deleteReservation");
 		String returnToMyReservations = request.getParameter("myReservations");
@@ -50,47 +52,44 @@ public class ReservationHandler extends HttpServlet {
 
 
 		
-		if (reservationStep == "" || reservationStep == null) {
-			reservationStep = determineReservationStep(editButton, deleteButton, returnToMyReservations, submitReservationForm,clerkEditButton, clerkSubmitReservationForm, clerkDeleteButton);
+		if (reservationAction == "" || reservationAction == null) {
+			reservationAction = determinereservationAction(editButton, deleteButton, returnToMyReservations, submitReservationForm,clerkEditButton, clerkSubmitReservationForm, clerkDeleteButton);
 		}
 		
-		System.out.print(reservationStep);
-		switch(reservationStep)
+		System.out.println(reservationAction);
+		switch(reservationAction)
 		
 		{
-		case "startReservation": //login.jsp
+		case "startReservation": 
 			System.out.println("start reservation executed!");
 			StartReservation(request,response);
 			break;
 			
-		case "createReservation": //loginClerk.jsp
+		case "createReservation": 
 			System.out.println("create reservation executed!");
 			CreateReservation(request,response);
 			break;
 		
-		case "editReservation": //loginClerk.jsp
+		case "editReservation": 
 			System.out.println("edit reservation executed!");
 			viewMyReservations(request, response, editButton);
 			break;
 			
-		case "deleteReservation": //loginClerk.jsp
+		case "deleteReservation": 
 			System.out.println("delete reservation executed!");
 			deleteReservations(request, response, deleteButton);
 			break;
-		case "getReservations" : //index.jsp
+			
+		case "getReservations" : 
 			System.out.println("getReservation executed!");
 			viewMyReservations(request, response);
 			break;
 			
-		case "submitReservationModify": //loginClerk.jsp
+		case "submitReservationModify": 
 			System.out.println("Modify reservation executed!");
 			
 			String startDate = request.getParameter("startDate");
 			String endDate = request.getParameter("endDate");
-			System.out.print("Start Date: ");
-			System.out.println(startDate);
-			System.out.print("End Date: ");
-			System.out.println(endDate);
 			
 			if (endDate == null || startDate == null || endDate == "" || startDate == "") {
 				handleBlankFields(request, response, submitReservationForm);
@@ -104,11 +103,19 @@ public class ReservationHandler extends HttpServlet {
 			}
 			break;
 			
-		case "returnToMyReservations": //loginClerk.jsp
+		case "returnToMyReservations": 
 			System.out.println("Return to reservations executed!");
 			viewMyReservations(request, response);
 			break;
-		case "checkOutStart": //indexClerk.jsp
+		case "checkInStart" : //viewReservationsClerk.jsp
+			System.out.println("checkin has begun!");
+			checkinStart(request, response);
+			break;
+		case "checkInConfirm" : //checkInReservations.jsp
+			System.out.println("checkin confirmation has begun");
+			checkinConfirm(request, response);
+			break;
+		case "checkOutStart": //viewReservationsClerk.jsp
 			System.out.println("checkout has begun!");
 			checkoutStart(request, response);
 			break;
@@ -172,7 +179,7 @@ public class ReservationHandler extends HttpServlet {
 		{ 
 			Class.forName("com.mysql.cj.jdbc.Driver");
 			//CONNECTION TO DB (change "hotel" to whatever you database name is.)
-			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=UTC","root", "12345678");
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC","root", "12345678");
 			PreparedStatement pst = con.prepareStatement("Select * from storage");
 			ResultSet rs = pst.executeQuery();
 			
@@ -216,10 +223,10 @@ public class ReservationHandler extends HttpServlet {
 				try {
 			    	Class.forName("com.mysql.cj.jdbc.Driver");
 					//CONNECTION TO DB (change "hotel" to whatever you database name is.)
-					Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=UTC","root", "12345678");
+					Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC","root", "12345678");
 					
 					//Fetch data for storage------------------------------------
-				    //Calculate cost
+					//Calculate cost
 			        String costQuery = "SELECT r.durationOfStay * (CASE rm.Quality "
 			                + "                    WHEN 'Excellent' THEN 150 "
 			                + "                    WHEN 'Good' THEN 100 "
@@ -246,7 +253,8 @@ public class ReservationHandler extends HttpServlet {
 					PreparedStatement pstStorageFetch = con.prepareStatement(fetchQuery);
 					pstStorageFetch.setString(1, guestEmail);
 					pstStorageFetch.setString(2, reservationId);
-					ResultSet storageFetchQuery = pstStorageFetch.executeQuery();	
+					ResultSet storageFetchQuery = pstStorageFetch.executeQuery();
+				    
 				    if (storageFetchQuery.next()) {
 						// Calculate the duration in days
 					    java.sql.Date startDate = storageFetchQuery.getDate("startDate");
@@ -255,7 +263,7 @@ public class ReservationHandler extends HttpServlet {
 					    int durationInDays = (int) TimeUnit.DAYS.convert(durationInMillis, TimeUnit.MILLISECONDS);
 				    	
 				    	//Insert data to storage
-						PreparedStatement pstStorage = con.prepareStatement("INSERT INTO storage(reservationID,startDate,endDate,checkInDate,guest_email,employer,durationOfStay,costOfStay) values(?,?,?,?,?,?,?,?)");
+					    PreparedStatement pstStorage = con.prepareStatement("INSERT INTO storage(reservationID,startDate,endDate,checkInDate,guest_email,employer,durationOfStay,costOfStay) values(?,?,?,?,?,?,?,?)");
 						pstStorage.setString(1,reservationId);
 						pstStorage.setDate(2,storageFetchQuery.getDate("startDate"));
 						pstStorage.setDate(3,storageFetchQuery.getDate("endDate"));
@@ -269,9 +277,9 @@ public class ReservationHandler extends HttpServlet {
 					}
 					// ---------------------------------------------------------
 					
-					PreparedStatement pst1 = con.prepareStatement("DELETE FROM reservation WHERE reservationID = ?");				
+				    PreparedStatement pst1 = con.prepareStatement("DELETE FROM reservation WHERE reservationID = ?");				
 					
-					pst1.setString(1, reservationId);
+				    pst1.setString(1, reservationId);
 					pst1.executeUpdate();
 					
 					//Fetch current points and add 1 point to the guest account---
@@ -307,11 +315,11 @@ public class ReservationHandler extends HttpServlet {
 				try {
 			    	Class.forName("com.mysql.cj.jdbc.Driver");
 					//CONNECTION TO DB (change "hotel" to whatever you database name is.)
-					Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=UTC","root", "12345678");
+					Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC","root", "12345678");
 					
 					
 					//Fetch data for storage------------------------------------
-				    //Calculate cost
+					//Calculate cost
 			        String costQuery = "SELECT r.durationOfStay * (CASE rm.Quality "
 			                + "                    WHEN 'Excellent' THEN 150 "
 			                + "                    WHEN 'Good' THEN 100 "
@@ -334,11 +342,14 @@ public class ReservationHandler extends HttpServlet {
 					if (rsLateStorage.next()) {
 						costOfStay += 50; //add 50 dollar late fee
 					}
+					
+					
 					String fetchQuery = "SELECT r.startDate,r.endDate,r.checkInDate,a.employer FROM reservation r JOIN account a ON(r.reservationName = a.email_id) WHERE r.reservationName = ? AND r.reservationID = ?";
 					PreparedStatement pstStorageFetch = con.prepareStatement(fetchQuery);
 					pstStorageFetch.setString(1, guestEmail);
 					pstStorageFetch.setString(2, reservationId);
-					ResultSet storageFetchQuery = pstStorageFetch.executeQuery();	
+					ResultSet storageFetchQuery = pstStorageFetch.executeQuery();
+				    
 				    if (storageFetchQuery.next()) {
 						// Calculate the duration in days
 					    java.sql.Date startDate = storageFetchQuery.getDate("startDate");
@@ -347,8 +358,7 @@ public class ReservationHandler extends HttpServlet {
 					    int durationInDays = (int) TimeUnit.DAYS.convert(durationInMillis, TimeUnit.MILLISECONDS);
 				    	
 				    	//Insert data to storage
-						PreparedStatement pstStorage = con.prepareStatement("INSERT INTO storage(reservationID,startDate,endDate,checkInDate,guest_email,employer,durationOfStay,costOfStay) values(?,?,?,?,?,?,?,?)");
-						pstStorage.setString(1,reservationId);
+					    PreparedStatement pstStorage = con.prepareStatement("INSERT INTO storage(reservationID,startDate,endDate,checkInDate,guest_email,employer,durationOfStay,costOfStay) values(?,?,?,?,?,?,?,?)");						pstStorage.setString(1,reservationId);
 						pstStorage.setDate(2,storageFetchQuery.getDate("startDate"));
 						pstStorage.setDate(3,storageFetchQuery.getDate("endDate"));
 						pstStorage.setDate(4,storageFetchQuery.getDate("checkInDate"));
@@ -362,7 +372,7 @@ public class ReservationHandler extends HttpServlet {
 					// ---------------------------------------------------------
 					
 					
-					PreparedStatement pst1 = con.prepareStatement("DELETE FROM reservation WHERE reservationID = ?");				
+				    PreparedStatement pst1 = con.prepareStatement("DELETE FROM reservation WHERE reservationID = ?");				
 					pst1.setString(1, reservationId);
 					pst1.executeUpdate();
 					
@@ -408,7 +418,7 @@ public class ReservationHandler extends HttpServlet {
 				try {
 			    	Class.forName("com.mysql.cj.jdbc.Driver");
 					//CONNECTION TO DB (change "hotel" to whatever you database name is.)
-					Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=UTC","root", "12345678");
+					Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC","root", "12345678");
 
 			        String query = "SELECT r.durationOfStay * (CASE rm.Quality "
 					                + "                    WHEN 'Excellent' THEN 150 "
@@ -461,7 +471,7 @@ public class ReservationHandler extends HttpServlet {
 				try {
 			    	Class.forName("com.mysql.cj.jdbc.Driver");
 					//CONNECTION TO DB (change "hotel" to whatever you database name is.)
-					Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=UTC","root", "12345678");
+					Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC","root", "12345678");
 
 			        String query = "SELECT r.durationOfStay * (CASE rm.Quality "
 					                + "                    WHEN 'Excellent' THEN 150 "
@@ -527,7 +537,7 @@ public class ReservationHandler extends HttpServlet {
 			{
 				Class.forName("com.mysql.cj.jdbc.Driver");
 				//CONNECTION TO DB (change "hotel" to whatever you database name is.)
-				Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=UTC","root", "12345678");
+				Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC","root", "12345678");
 				//SQL query to database here. (PLEASE NAME YOUR DB TO hotel)
 				
 				//Call the reservation Catalog and room catalog.
@@ -598,7 +608,6 @@ public class ReservationHandler extends HttpServlet {
 					dispatcher.forward(request, response);
 				}
 				
-				
 			} catch (Exception e)
 			{
 				e.printStackTrace();
@@ -620,18 +629,15 @@ public class ReservationHandler extends HttpServlet {
 		
 		boolean testMode = "true".equals(request.getParameter("testMode")); //check if request from junit
 		
-
-
-		
 		try 
 		{
 			Class.forName("com.mysql.cj.jdbc.Driver");
 			//CONNECTION TO DB (change "hotel" to whatever you database name is.)
-			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=UTC","root", "12345678");
+			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC","root", "12345678");
 			
 			//Call the reservation Catalog and room catalog.
-			PreparedStatement pst = con.prepareStatement("Insert into reservation (id,startDate,endDate,reservationName,accountType,isCheckedIn,durationOfStay) values (?,?,?,?,?,'0',?)");
-			
+			PreparedStatement pst = con.prepareStatement("Insert into reservation (id,startDate,endDate,reservationName,accountType,durationOfStay,checkInDate,isCheckedIn) values (?,?,?,?,?,?,?,0)");
+		
 			//Because we are retrieving from session, we need to create separate 
 			//variables to retrieve from a request parameter for the junit test
 			String startDate;
@@ -649,11 +655,23 @@ public class ReservationHandler extends HttpServlet {
 				reservationName = (String) session.getAttribute("email");
 				accountType = (String) session.getAttribute("type");	
 			}
+			boolean clerkLoggedIn = false;
+			
+			if (accountType.compareTo("clerk") == 0)
+			{
+				clerkLoggedIn = true;
+				accountType = (String) session.getAttribute("guestType");
+				reservationName = (String) session.getAttribute("guestEmailName");
+			}
 			
 			// Calculate the duration in days
 	        LocalDate startLocalDate = LocalDate.parse(startDate);
 	        LocalDate endLocalDate = LocalDate.parse(endDate);
 	        long durationInDays = ChronoUnit.DAYS.between(startLocalDate, endLocalDate);
+	        
+	        // Guest is initially not checked in
+	        boolean isCheckedIn = false; 
+	        String checkInDate = "Yet to be Checked-In";
 			
 			pst.setString(1, id);
 			pst.setString(2, startDate);
@@ -661,6 +679,7 @@ public class ReservationHandler extends HttpServlet {
 			pst.setString(4, reservationName);
 			pst.setString(5, accountType);
 			pst.setLong(6, durationInDays);
+			pst.setString(7,  checkInDate);
 			
 			pst.executeUpdate();
 			
@@ -680,10 +699,17 @@ public class ReservationHandler extends HttpServlet {
 			reservation.setEndDate(endDate);
 			reservation.setReservationName(reservationName);
 			reservation.setAccountType(accountType);
+			reservation.setIsCheckedIn(isCheckedIn);
+			reservation.setCheckInDate(checkInDate);
 			
 			request.setAttribute("ri", reservation);
 			
 			dispatcher = request.getRequestDispatcher("reservationConfirmation.jsp");
+			if (clerkLoggedIn)
+			{
+				dispatcher = request.getRequestDispatcher("reservationConfirmationClerk.jsp");
+			}
+			
 			if (testMode == false) {
 				dispatcher.forward(request, response);			
 			}
@@ -698,6 +724,7 @@ public class ReservationHandler extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
 	
@@ -718,9 +745,13 @@ public class ReservationHandler extends HttpServlet {
 		} else {
 			currentUser = (String) session.getAttribute("email");
 			accountType = (String) session.getAttribute("type");
-			System.out.println("Account type: " + accountType);
 		}
-
+		
+		if (accountType.compareTo("clerk") == 0)
+		{
+			currentUser = (String) session.getAttribute("guestEmailName");
+		}
+		
 		try 
 		{
 			int reservation_id;
@@ -729,30 +760,121 @@ public class ReservationHandler extends HttpServlet {
 			} else {
 				reservation_id =  Integer.parseInt(deleteParams);			
 			}
-			
-
 
 			Connection con = null;
 			Class.forName("com.mysql.cj.jdbc.Driver");
-			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=America/Chicago","root", "12345678");
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC","root", "12345678");
 			
+			PreparedStatement  billingInfoQueury = con.prepareStatement("SELECT ccNum, ccExp, ccAddress FROM hotel.account WHERE email_id = ?");
 			
-			PreparedStatement reservationDelete = con.prepareStatement("DELETE FROM reservation WHERE reservationID = ?;");
+			/* Obtain billing information from specific guest */
+			String billingInfoQuery = "SELECT ccNum, ccExp, ccAddress FROM hotel.account WHERE email_id = ?";
 			
-			reservationDelete.setInt(1, reservation_id);
-			int rowsDeleted = reservationDelete.executeUpdate();
+			PreparedStatement biQuery = con.prepareStatement(billingInfoQuery);
+			biQuery.setString(1, currentUser);
 			
-			// Write success response for unit test
-	        if (testMode) {
-		        PrintWriter out = response.getWriter();
-		        response.setContentType("text/plain");
-		        response.setCharacterEncoding("UTF-8");
-		        out.write("success");
-		        out.flush();
-		        out.close();
-	        }
-			if (testMode == false) {
-				viewMyReservations(request, response);
+			String ccNum = "";
+			String ccExp = "";
+			String ccAddress = "";
+			
+			ResultSet rs = biQuery.executeQuery();
+			if (rs.next())
+			{	
+				ccNum = rs.getString("ccNum");
+				ccExp = rs.getString("ccExp");
+				ccAddress = rs.getString("ccAddress");
+			}
+			
+			/* Getting cancellation date */
+			LocalDate localDate = LocalDate.now();
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+			String deleteDate = localDate.format(formatter);
+		    
+			/* Getting access to year, month, day for delete date */
+			String[] deleteDateData = deleteDate.split("-");
+			
+			/* Getting start date information */
+			String startDate = "";
+			boolean isCheckedIn = false;
+			
+			PreparedStatement startDateQuery = con.prepareStatement("SELECT startDate, isCheckedIn FROM reservation WHERE reservationID=?");
+			startDateQuery.setInt(1, reservation_id);
+			rs = startDateQuery.executeQuery();
+			if (rs.next())
+			{	
+				startDate = rs.getString("startDate");
+				isCheckedIn = (rs.getInt("isCheckedIn") == 1) ? true : false;
+			}
+			
+			/* Getting access to year, month, day for start date */
+			String[] startDateData = startDate.split("-");
+					
+			/* Year is first index, month is second index, day is third index */
+			int year = 0;
+			int month = 1;
+			int day = 2;
+			
+			boolean issueCancellationFee = false;
+			
+			/* Check if cancellation date falls within 2 days of reservation start date */
+			if (deleteDateData[year].compareTo(startDateData[year]) == 0 && 
+				deleteDateData[month].compareTo(startDateData[month]) == 0 &&
+				Integer.valueOf(startDateData[day]) - Integer.valueOf(deleteDateData[day]) <= 2)
+			{
+				issueCancellationFee = true;
+			}
+			
+			/* Missing billing information from guest */
+			if (ccNum.compareTo("") == 0 || ccExp.compareTo("") == 0 || ccAddress.compareTo("") == 0)
+			{
+				dispatcher = request.getRequestDispatcher("accountbilling.jsp");
+				dispatcher.forward(request, response);
+			}
+			/* Not missing billing information, continue delete */
+			else 
+			{
+				if (isCheckedIn == false)
+				{
+					if (issueCancellationFee)
+					{
+						String costQuery = "SELECT 0.80 * (CASE rm.Quality "
+					                + "                    WHEN 'Excellent' THEN 150 "
+					                + "                    WHEN 'Good' THEN 100 "
+					                + "                    WHEN 'Average' THEN 80 "
+					                + "                    WHEN 'Poor' THEN 50 "
+					                + "                    ELSE 0 "
+					                + "                    END) as amountDue "
+					                + "FROM reservation r JOIN rooms rm USING(id) WHERE r.reservationID = ?";
+						PreparedStatement cancellationFee = con.prepareStatement(costQuery);
+						cancellationFee.setInt(1, reservation_id);
+						
+						rs = cancellationFee.executeQuery();
+						if (rs.next())
+						{
+							session.setAttribute("cancellationFee", rs.getString("amountDue"));
+						}
+						
+						dispatcher = request.getRequestDispatcher("cancellationFee.jsp");
+						dispatcher.forward(request, response);
+					}
+				
+					PreparedStatement reservationDelete = con.prepareStatement("DELETE FROM reservation WHERE reservationID = ?;");
+					reservationDelete.setInt(1, reservation_id);
+					int rowsDeleted = reservationDelete.executeUpdate();
+				}
+				
+				// Write success response for unit test
+		        if (testMode) {
+			        PrintWriter out = response.getWriter();
+			        response.setContentType("text/plain");
+			        response.setCharacterEncoding("UTF-8");
+			        out.write("success");
+			        out.flush();
+			        out.close();
+		        }
+				if (testMode == false && issueCancellationFee == false) {
+					viewMyReservations(request, response);
+				}
 			}
 		} catch (Exception e)
 		{
@@ -761,19 +883,35 @@ public class ReservationHandler extends HttpServlet {
 	}
 	
 	public void viewMyReservations(HttpServletRequest request, HttpServletResponse response) {
+		
 		HttpSession session = request.getSession();
+		
+		// Checking whether the Clerk or Guest is viewing reservations
 		String currentUser = (String) session.getAttribute("email");
+		String accountType = (String) session.getAttribute("type");
+		if (accountType.compareTo("clerk") == 0)
+		{
+			currentUser = (String) session.getAttribute("guestEmailName");
+		}
+		
 		RequestDispatcher dispatcher = null;
 		
 		try 
 		{
 		
 			List<Reservation> myReservations = getMyReservations(request, response, currentUser);
-			System.out.println(myReservations);
 
 			request.setAttribute("reservations", myReservations);
 			
-			dispatcher = request.getRequestDispatcher("viewReservations.jsp");
+			if (accountType.compareTo("clerk") == 0)
+			{
+				dispatcher = request.getRequestDispatcher("viewReservationsClerk.jsp");
+			}
+			else
+			{
+				dispatcher = request.getRequestDispatcher("viewReservations.jsp");
+			}
+			
 			dispatcher.forward(request, response);
 			
 		} catch (Exception e)
@@ -827,8 +965,15 @@ public class ReservationHandler extends HttpServlet {
 	
 	public void submitReservationUpdates(HttpServletRequest request, HttpServletResponse response, String submitReservationForm, String startDate, String endDate) {
 		HttpSession session = request.getSession();
+		
+		// Checking whether the Clerk or Guest is viewing reservations
 		String currentUser = (String) session.getAttribute("email");
 		String accountType = (String) session.getAttribute("type");
+		if (accountType.compareTo("clerk") == 0)
+		{
+			currentUser = (String) session.getAttribute("guestEmailName");
+		}
+		
 		RequestDispatcher dispatcher = null;
 		String[] submitReservationParams = submitReservationForm.split("-");
 		
@@ -840,7 +985,7 @@ public class ReservationHandler extends HttpServlet {
 
 			Connection con = null;
 			Class.forName("com.mysql.cj.jdbc.Driver");
-			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=America/Chicago","root", "12345678");
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC","root", "12345678");
 			PreparedStatement currentReservations = con.prepareStatement("SELECT reservationId FROM reservation WHERE id = ? AND reservationName != ? AND ((? >= startDate AND ? <= endDate) OR  (? >= startDate AND ? <= endDate) OR (? <= startDate AND ? >= endDate));");
 			currentReservations.setInt(1, room_id);
 			currentReservations.setString(2, currentUser);
@@ -852,7 +997,6 @@ public class ReservationHandler extends HttpServlet {
 			currentReservations.setString(8,endDate);
 
 			ResultSet rs = currentReservations.executeQuery();
-			System.out.println(rs);
 			if (rs.next()) {
 				request.setAttribute("warning", "This room is already reserved for the dates you provided. Please try different dates.");
 				request.setAttribute("reservationId", submitReservationForm);
@@ -869,7 +1013,7 @@ public class ReservationHandler extends HttpServlet {
 
 				int rowsUpdated = updateReservation.executeUpdate();
 
-				if (accountType == "guest") {
+				if (accountType.compareTo("guest") == 0) {
 					viewMyReservations(request, response);
 				} else if (accountType == "clerk") {
 					clerkViewReservations(request, response);
@@ -901,9 +1045,47 @@ public class ReservationHandler extends HttpServlet {
 			
 		}
 	}
+	
+	public Reservation getMyReservation(HttpServletRequest request, HttpServletResponse response, int reservationID) {
+		Connection con = null;
+		
+		Reservation myReservation = new Reservation();
+		
+		try 
+		{
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			//CONNECTION TO DB (change "hotel" to whatever you database name is.)
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC","root", "12345678");
+			
+			
+			PreparedStatement pst = con.prepareStatement("SELECT * FROM reservation WHERE reservationID=?;");
+
+			
+			pst.setInt(1, reservationID);
+			ResultSet rs = pst.executeQuery();
+			
+			while(rs.next()) {
+				myReservation.setId(rs.getString("reservationID"));
+				myReservation.setRoomId(rs.getString("id"));
+				myReservation.setStartDate(rs.getString("startDate"));
+				myReservation.setEndDate(rs.getString("endDate"));
+				myReservation.setCheckInDate(rs.getString("checkInDate"));
+				myReservation.setIsCheckedIn(rs.getBoolean("isCheckedIn"));
+				myReservation.setReservationName(rs.getString("reservationName"));
+			}
+			
+
+		} catch (SQLException | ClassNotFoundException e)
+		{  
+			e.printStackTrace();
+		}
+		
+		return myReservation;
+		
+	}
+	
 	public List<Reservation> getMyReservations(HttpServletRequest request, HttpServletResponse response, String currentUser)
 	{
-		System.out.println(currentUser);
 		Connection con = null;
 		
 		List<Reservation> myReservations = new ArrayList<>();
@@ -911,10 +1093,10 @@ public class ReservationHandler extends HttpServlet {
 		{
 			Class.forName("com.mysql.cj.jdbc.Driver");
 			//CONNECTION TO DB (change "hotel" to whatever you database name is.)
-			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=America/Chicago","root", "12345678");
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC","root", "12345678");
 			
 			
-			PreparedStatement pst = con.prepareStatement("SELECT reservationID, reservation.id AS 'roomID', rooms.roomInformation AS 'roomInformation', startDate, endDate, reservationName FROM reservation RIGHT JOIN rooms ON reservation.id = rooms.id WHERE reservationName = ?;");
+			PreparedStatement pst = con.prepareStatement("SELECT reservationID, reservation.id AS 'roomID', rooms.roomInformation AS 'roomInformation', startDate, endDate, reservationName, checkInDate FROM reservation RIGHT JOIN rooms ON reservation.id = rooms.id WHERE reservationName = ?;");
 
 			
 			pst.setString(1, currentUser);
@@ -927,6 +1109,7 @@ public class ReservationHandler extends HttpServlet {
 				a.setRoomInformation(rs.getString("roomInformation"));
 				a.setStartDate(rs.getString("startDate"));
 				a.setEndDate(rs.getString("endDate"));
+				a.setCheckInDate(rs.getString("checkInDate"));
 				myReservations.add(a);
 			}
 			
@@ -951,28 +1134,119 @@ public class ReservationHandler extends HttpServlet {
 		return warning;
 	}
 
-	public String determineReservationStep(String editButton, String deleteButton, String returnToMyReservations, String submitReservationForm, String clerkEditButton, String clerkSubmitReservationForm, String clerkDeleteButton) {
-		String reservationStep = "";
+	public String determinereservationAction(String editButton, String deleteButton, String returnToMyReservations, String submitReservationForm, String clerkEditButton, String clerkSubmitReservationForm, String clerkDeleteButton) {
+		String reservationAction = "";
 		
 		if (editButton != null) {
-			reservationStep = "editReservation";
+			reservationAction = "editReservation";
 		} else if (deleteButton != null) {
-			reservationStep = "deleteReservation";
+			reservationAction = "deleteReservation";
 		} else if (returnToMyReservations != null) {
-			reservationStep = "returnToMyReservations";
+			reservationAction = "returnToMyReservations";
 
 		} else if (submitReservationForm != null) {
-			reservationStep = "submitReservationModify";
+			reservationAction = "submitReservationModify";
 		} else if (clerkEditButton != null) {
-			reservationStep = "clerkEditReservation";
+			reservationAction = "clerkEditReservation";
 		} else if (clerkSubmitReservationForm != null) {
-			reservationStep = "clerkSubmitReservation";
+			reservationAction = "clerkSubmitReservation";
 		} else if (clerkDeleteButton != null) {
-			reservationStep = "clerkDeleteReservation";
+			reservationAction = "clerkDeleteReservation";
 		}
 		
 		
-		return reservationStep;
+		return reservationAction;
+	}
+	
+	//checkin for client
+	public void checkinStart(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		HttpSession session = request.getSession();
+		
+		int reservationID = Integer.parseInt(request.getParameter("reservationID"));
+		
+		// Checking whether the Clerk or Guest is viewing reservations
+		String currentUser = (String) session.getAttribute("email");
+		String accountType = (String) session.getAttribute("type");
+		if (accountType.compareTo("clerk") == 0)
+		{
+			currentUser = (String) session.getAttribute("guestEmailName");
+		}
+		
+		RequestDispatcher dispatcher = null;
+		
+		try 
+		{
+			Reservation myReservation = getMyReservation(request, response, reservationID);
+			
+			// To work in checkInReservation.jsp
+			request.setAttribute("myreservation", myReservation);
+			
+			// To work in checkinConfirm
+			session.setAttribute("myreservation", myReservation);
+			
+			dispatcher = request.getRequestDispatcher("checkInReservations.jsp");
+
+			dispatcher.forward(request, response);
+			
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	public void checkinConfirm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		String checkInDate = request.getParameter("checkInDate");
+		
+		HttpSession session = request.getSession();
+		Connection con = null;
+		
+		// Checking whether the Clerk or Guest is viewing reservations
+		//String currentUser = (String) session.getAttribute("email");
+		//String accountType = (String) session.getAttribute("type");
+		//if (accountType.compareTo("clerk") == 0)
+		//{
+		//	  currentUser = (String) session.getAttribute("guestEmailName");
+		//}
+		
+		Reservation myReservation = (Reservation) session.getAttribute("myreservation");
+		
+		String reservationID = myReservation.getId();
+		String startDate = myReservation.getStartDate();
+		String endDate = myReservation.getEndDate();
+		boolean isCheckedIn = myReservation.getIsCheckedIn();
+		
+		RequestDispatcher dispatcher = null;
+		
+		try 
+		{
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			//CONNECTION TO DB (change "hotel" to whatever you database name is.)
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC","root", "12345678");
+			
+			PreparedStatement updateCheckIn = con.prepareStatement("UPDATE reservation SET checkInDate=?, isCheckedIn=? WHERE reservationID=?");
+			
+			updateCheckIn.setString(1, checkInDate);
+			updateCheckIn.setInt(2, 1);
+			updateCheckIn.setString(3, reservationID);
+			
+			// Check if checkInDate is within startDate and endDate as well as preventing overwrites if already checked-in
+			if (checkInDate.compareTo(startDate) >= 0 && checkInDate.compareTo(endDate) <= 0 && isCheckedIn == false)
+			{
+				int updatedRows = updateCheckIn.executeUpdate();
+				dispatcher = request.getRequestDispatcher("searchGuest.jsp");
+			}
+			else 
+			{
+				dispatcher = request.getRequestDispatcher("checkInReservations.jsp");
+			}
+
+			dispatcher.forward(request, response);
+			
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 	
 	//checkout for client  (if testing this, make sure to change to 1 for isCheckedIn)
@@ -981,6 +1255,7 @@ public class ReservationHandler extends HttpServlet {
 	
 		try 
 		{
+			
 			String email = null;
 			
 			//For session email check when function called by checkoutConfirm
@@ -995,9 +1270,9 @@ public class ReservationHandler extends HttpServlet {
 			try {
 				Class.forName("com.mysql.cj.jdbc.Driver");
 				//CONNECTION TO DB (change "hotel" to whatever you database name is.)
-				Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=UTC","root", "12345678");
+				Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC","root", "12345678");
 				//SQL query to database here. (PLEASE NAME YOUR DB TO hotel)
-				PreparedStatement pst = con.prepareStatement("SELECT * FROM reservation WHERE reservationName = ? AND accountType='guest' AND isCheckedIn='1'");
+				PreparedStatement pst = con.prepareStatement("SELECT * FROM reservation WHERE reservationName = ? AND accountType='guest' AND isCheckedIn=1");
 				
 				pst.setString(1, email);
 				session.setAttribute("guestName", email);
@@ -1040,10 +1315,10 @@ public class ReservationHandler extends HttpServlet {
 		{
 			Class.forName("com.mysql.cj.jdbc.Driver");
 			//CONNECTION TO DB (change "hotel" to whatever you database name is.)
-			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=America/Chicago","root", "12345678");
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC","root", "12345678");
 			
 			
-			PreparedStatement pst = con.prepareStatement("SELECT reservationID, reservation.id AS 'roomID', rooms.roomInformation AS 'roomInformation', startDate, endDate, reservationName FROM reservation RIGHT JOIN rooms ON reservation.id = rooms.id WHERE reservation.id IS NOT NULL;");
+			PreparedStatement pst = con.prepareStatement("SELECT reservationID, reservation.id AS 'roomID', rooms.roomInformation AS 'roomInformation', startDate, endDate, reservationName, checkInDate FROM reservation RIGHT JOIN rooms ON reservation.id = rooms.id WHERE reservation.id IS NOT NULL;");
 
 			ResultSet rs = pst.executeQuery();
 			
@@ -1056,6 +1331,7 @@ public class ReservationHandler extends HttpServlet {
 				a.setStartDate(rs.getString("startDate"));
 				a.setEndDate(rs.getString("endDate"));
 				a.setReservationName(rs.getString("reservationName"));
+				a.setCheckInDate(rs.getString("checkInDate"));
 				myReservations.add(a);
 				}
 			}
@@ -1080,7 +1356,7 @@ public class ReservationHandler extends HttpServlet {
 			List<Reservation> myReservations = getAllReservations(request, response);
 			request.setAttribute("reservations", myReservations);
 			
-			dispatcher = request.getRequestDispatcher("clerkViewReservations.jsp");
+			dispatcher = request.getRequestDispatcher("viewAllReservations.jsp");
 			dispatcher.forward(request, response);
 			
 		} catch (Exception e)
@@ -1092,6 +1368,8 @@ public class ReservationHandler extends HttpServlet {
 	public void clerkViewReservations(HttpServletRequest request, HttpServletResponse response, String editParams) {
 		HttpSession session = request.getSession();
 		String currentUser = (String) session.getAttribute("email");
+		String accountType = (String) session.getAttribute("type");
+		
 		RequestDispatcher dispatcher = null;
 		System.out.println("View Reservations Form type: " + session.getAttribute("type"));
 		System.out.println("Edit Params: " + editParams);
@@ -1099,6 +1377,8 @@ public class ReservationHandler extends HttpServlet {
 		try 
 		{
 			request.setAttribute("reservationId", editParams);
+			session.setAttribute("startDate", request.getAttribute("startDate"));
+			session.setAttribute("endDate", request.getAttribute("startDate"));
 			
 			dispatcher = request.getRequestDispatcher("clerkReservationsForm.jsp");
 			dispatcher.forward(request, response);
@@ -1116,9 +1396,8 @@ public class ReservationHandler extends HttpServlet {
 		String accountType = (String) session.getAttribute("type");
 		RequestDispatcher dispatcher = null;
 		String[] submitReservationParams = submitReservationForm.split("-");
-		String currentUser = submitReservationParams[2];
+		String currentUser = (String) session.getAttribute("guestEmailName");
 
-		
 		try 
 		{
 			
@@ -1127,7 +1406,7 @@ public class ReservationHandler extends HttpServlet {
 
 			Connection con = null;
 			Class.forName("com.mysql.cj.jdbc.Driver");
-			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=America/Chicago","root", "12345678");
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC","root", "12345678");
 			PreparedStatement currentReservations = con.prepareStatement("SELECT reservationId FROM reservation WHERE id = ? AND reservationName != ? AND ((? >= startDate AND ? <= endDate) OR  (? >= startDate AND ? <= endDate) OR (? <= startDate AND ? >= endDate));");
 			currentReservations.setInt(1, room_id);
 			currentReservations.setString(2, currentUser);
@@ -1186,8 +1465,7 @@ public class ReservationHandler extends HttpServlet {
 		}
 	}
 
-	public void clerkHandleBlankFields(HttpServletRequest request, HttpServletResponse response, String submitReservationForm) {
-		
+	public void clerkHandleBlankFields(HttpServletRequest request, HttpServletResponse response, String submitReservationForm) { 
 		RequestDispatcher dispatcher = null;
 		String[] submitReservationParams = submitReservationForm.split("-");
 		HttpSession session = request.getSession();
@@ -1214,7 +1492,22 @@ public class ReservationHandler extends HttpServlet {
 		HttpSession session = request.getSession();
 		String currentUser = (String) session.getAttribute("email");
 		String accountType = (String) session.getAttribute("type");
-		System.out.println("Account type: " + accountType);
+		
+		/* For billing if within the 2 days prior to startDate */
+		String ccNum = "";
+	    String ccExp = "";
+	    String ccAddress = "";
+	    
+		// Checking for clerk credentials
+		if (accountType.compareTo("clerk") == 0)
+		{
+			// sets the accountType to guest as all reservations are under guests
+			String guestType = (String) "guest";
+			accountType = guestType;
+			// sets the currentUser to the reservationName as this is what the reservation will be under
+			currentUser = (String) session.getAttribute("guestEmailName");
+		}
+		
 		RequestDispatcher dispatcher = null;
 		try 
 		{
@@ -1222,16 +1515,120 @@ public class ReservationHandler extends HttpServlet {
 
 			Connection con = null;
 			Class.forName("com.mysql.cj.jdbc.Driver");
-			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=America/Chicago","root", "12345678");
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC","root", "12345678");
 			
+			PreparedStatement  billingInfoQueury = con.prepareStatement("SELECT ccNum, ccExp, ccAddress FROM hotel.account WHERE email_id = ?");
 			
-			PreparedStatement reservationDelete = con.prepareStatement("DELETE FROM reservation WHERE reservationID = ?;");
-
-			reservationDelete.setInt(1, reservation_id);
-			int rowsDeleted = reservationDelete.executeUpdate();
+			/* Obtain billing information from specific guest */
+			String billingInfoQuery = "SELECT ccNum, ccExp, ccAddress FROM hotel.account WHERE email_id = ?";
 			
-			clerkViewReservations(request, response);
-		
+			PreparedStatement biQuery = con.prepareStatement(billingInfoQuery);
+			biQuery.setString(1, currentUser);
+			
+			ResultSet rs = biQuery.executeQuery();
+			if (rs.next())
+			{	
+				ccNum = rs.getString("ccNum");
+				ccExp = rs.getString("ccExp");
+				ccAddress = rs.getString("ccAddress");
+				
+				session.setAttribute("ccNum", ccNum);
+				session.setAttribute("ccExp", ccExp);
+				session.setAttribute("ccAddress", ccAddress);
+			}
+			
+			/* Getting cancellation date */
+			LocalDate localDate = LocalDate.now();
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+			String deleteDate = localDate.format(formatter);
+		    
+			/* Getting access to year, month, day for delete date */
+			String[] deleteDateData = deleteDate.split("-");
+			
+			/* Getting start date information */
+			String startDate = "";
+			boolean isCheckedIn = false;
+			
+			PreparedStatement startDateQuery = con.prepareStatement("SELECT startDate, isCheckedIn FROM reservation WHERE reservationID=?");
+			startDateQuery.setInt(1, reservation_id);
+			rs = startDateQuery.executeQuery();
+			if (rs.next())
+			{	
+				startDate = rs.getString("startDate");
+				isCheckedIn = (rs.getInt("isCheckedIn") == 1) ? true : false;
+			}
+			
+			/* Getting access to year, month, day for start date */
+			String[] startDateData = startDate.split("-");
+					
+			/* Year is first index, month is second index, day is third index */
+			int year = 0;
+			int month = 1;
+			int day = 2;
+			
+			boolean issueCancellationFee = false;
+			
+			/* Check if cancellation date falls within 2 days of reservation start date */
+			if (deleteDateData[year].compareTo(startDateData[year]) == 0 && 
+				deleteDateData[month].compareTo(startDateData[month]) == 0 &&
+				Integer.valueOf(startDateData[day]) - Integer.valueOf(deleteDateData[day]) <= 2)
+			{
+				issueCancellationFee = true;
+			}
+	
+			/* Missing billing information from guest */
+			if (ccNum.compareTo("") == 0 || ccExp.compareTo("") == 0 || ccAddress.compareTo("") == 0)
+			{
+				dispatcher = request.getRequestDispatcher("accountbillingClerk.jsp");
+				dispatcher.forward(request, response);
+			}
+			/* Not missing billing information, continue delete */
+			else 
+			{
+				if (isCheckedIn == false)
+				{
+					if (issueCancellationFee)
+					{
+						String costQuery = "SELECT 0.80 * (CASE rm.Quality "
+					                + "                    WHEN 'Excellent' THEN 150 "
+					                + "                    WHEN 'Good' THEN 100 "
+					                + "                    WHEN 'Average' THEN 80 "
+					                + "                    WHEN 'Poor' THEN 50 "
+					                + "                    ELSE 0 "
+					                + "                    END) as amountDue "
+					                + "FROM reservation r JOIN rooms rm USING(id) WHERE r.reservationID = ?";
+						PreparedStatement cancellationFee = con.prepareStatement(costQuery);
+						cancellationFee.setInt(1, reservation_id);
+						
+						rs = cancellationFee.executeQuery();
+						if (rs.next())
+						{
+							session.setAttribute("cancellationFee", rs.getString("amountDue"));
+						}
+						
+						dispatcher = request.getRequestDispatcher("cancellationFeeClerk.jsp");
+						dispatcher.forward(request, response);
+					}
+					
+					// Delete statement
+					PreparedStatement reservationDelete = con.prepareStatement("DELETE FROM reservation WHERE reservationID = ?;");
+					
+					// setting wildcards in the statement to its respective value
+					reservationDelete.setInt(1, reservation_id);
+					
+					// executing the update
+					int rowsDeleted = reservationDelete.executeUpdate();
+				}
+				
+				// Calling the clerk's reservation view
+				if (issueCancellationFee == false)
+				{
+					clerkViewReservations(request, response);
+				}
+				
+				// For Unit Testing
+				request.setAttribute("status", "success");
+			}
 		} catch (Exception e)
 		{
 			e.printStackTrace();

@@ -40,7 +40,7 @@ class Start_Reservation {
         httpPost.setHeader("Content-Type", "application/x-www-form-urlencoded");
 
         List<NameValuePair> params = new ArrayList<>();
-        params.add(new BasicNameValuePair("reservationStep", "startReservation"));
+        params.add(new BasicNameValuePair("reservationAction", "startReservation"));
         params.add(new BasicNameValuePair("testMode", "true"));
         
         httpPost.setEntity(new UrlEncodedFormEntity(params));

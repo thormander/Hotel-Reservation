@@ -37,6 +37,8 @@
 									class="form-submit" value="Log in" />
 							</div>
 						</form>
+						<a href="login.jsp">Login as Guest</a>
+						<a href="loginClerk.jsp">Login as Clerk</a>
 					</div>
 				</div>
 			</div>

@@ -23,7 +23,7 @@
 			<div class="container">
 				<div class="signup-content">
 					<div class="signup-form">
-						<h2 class="form-title">Modify Reservation</h2>
+						<h1 class="form-title">Modify Guest Reservation</h1>
 						<%
 						  String warning = (String) request.getAttribute("warning");						 
 						  if (warning == null || warning == "") {%>
@@ -33,6 +33,24 @@
 							  <p><b><%= warning %></b></p>
 						 <% }
 						%>
+						<h2>Reservation Information</h2>
+	
+						<table border = "1">
+							<thead>
+								<tr>
+									<th>Start Date</th>
+									<th>End Date</th>
+								</tr>
+							</thead>
+							
+							<tbody>
+									<tr>
+										<td><c:out value="${startDate}"/></td>
+										<td><c:out value="${endDate}"/></td>
+									</tr>
+							</tbody>
+						</table>
+						
 						<form method="post" action="reservationHandler">
 							<div class="form-group">
 								<p><b>Start Date:</b><input type="date" name="startDate" id="startDate" placeholder="Start Date"/></p>
@@ -47,7 +65,7 @@
 							</form>
 							<form method="post" action="reservationHandler">
 							<div>
-						    <button type="submit" name="reservationStep" value="clerkViewReservations">Back to Reservations</button>
+						    <button type="submit" name="reservationAction" value="clerkViewReservations">Back to Reservations</button>
 							</div>
 						</form>
 					</div>

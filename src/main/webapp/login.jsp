@@ -32,7 +32,7 @@
 									placeholder="Your Email" required="required"/>
 							</div>
 							<div class="form-group">
-								<<input type="password" name="password" id="password"
+								<input type="password" name="password" id="password"
 									placeholder="Password" required="required"/>
 							</div>
 							<div>

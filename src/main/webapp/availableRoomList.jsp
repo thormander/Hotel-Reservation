@@ -21,7 +21,7 @@
 	<h1>Available Rooms:</h1>
 	
 		<form method="post" action="reservationHandler">
-			<input type="hidden" name="reservationStep" value="createReservation">
+			<input type="hidden" name="reservationAction" value="createReservation">
 		
 			<table border = "1">
 			

@@ -15,40 +15,28 @@
 
 <!------------------------------------------------------------------------------------------------------------------->
 <body>
-	<h1>Reservation Confirmed!</h1>
+	<h1>Cancellation Fee Issued </h1>
+	
+	<h2>Billing Information</h2>
 	
 	<table border = "1">
 		<thead>
 			<tr>
-				<th>ID</th>
-				<th>Start Date</th>
-				<th>End Date</th>
-				<th>Reservation Name</th>
-				<th>Check In Date</th>
+				<th>Credit Card Number</th>
+				<th>Credit Card Expiration Date</th>
+				<th>Credit Card Billing Address</th>
+				<th>Cost</th>
 			</tr>
 		</thead>
 		
 		<tbody>
 				<tr>
-					<td><c:out value="${ri.id}"/></td>
-					<td><c:out value="${ri.startDate}"/></td>
-					<td><c:out value="${ri.endDate}"/></td>
-					<td><c:out value="${ri.reservationName}"/></td>
-					<td><c:out value="${ri.checkInDate}"/></td>
+					<td><c:out value="${ccNum}"/></td>
+					<td><c:out value="${ccExp}"/></td>
+					<td><c:out value="${ccAddress}"/></td>
+					<td><c:out value="${cancellationFee}"/></td>
 				</tr>
 		</tbody>
 	</table>
-	<a href="searchRooms.jsp">Create another reservation?</a>
 	<a href="index.jsp">Back to account home?</a>
 </body>
-
-
-
-
-
-
-
-
-
-
-</html>

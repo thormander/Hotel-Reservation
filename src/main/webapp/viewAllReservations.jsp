@@ -1,7 +1,7 @@
 <%
 	if(session.getAttribute("name")==null)
 	{
-		response.sendRedirect("index.jsp");
+		response.sendRedirect("indexClerk.jsp");
 	}
 %>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
@@ -12,11 +12,11 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Reservations</title>
+<title>All Reservations</title>
 </head>
 <body>
-<a href="indexClerk.jsp">Return to Main Menu</a>
-<h1>Manage Reservations</h1>
+<a href="indexClerk.jsp">Return back to dashboard</a>
+<h1>Manage All Reservations</h1>
 <div class="row">
 	
 		<div class="container">
@@ -26,23 +26,23 @@
 				<thead>
 					<tr>
 					<th>Room ID</th>
-					<th align="left">Guest</th>
 						<th>Start Date</th>
 						<th>End Date</th>
 						<th>Room Information</th>
+						<th>Check In Date</th>
 					</tr>
 				</thead>
 				<tbody>
-						<c:forEach var="reservation" items="${requestScope.reservations}">
+						<c:forEach var="reservation" items="${reservations}">
 						<tr>
 							<td><c:out value="${reservation.roomId}"/></td>
-							<td><c:out value="${reservation.reservationName}"/></td>
 							<td><c:out value="${reservation.startDate}"/></td>
 							<td><c:out value="${reservation.endDate}" /></td>
 							<td><c:out value="${reservation.roomInformation}" /></td>
+							<td><c:out value="${reservation.checkInDate}" /></td>
 							<form action=reservationHandler method="post">
 							<td>
-							<button type="submit" name="clerkEditReservation" value="${reservation.roomId}-${reservation.id}-${reservation.reservationName}">Modify</button></td>
+								<button type="submit" name="clerkEditReservation" value="${reservation.roomId}-${reservation.id}">Modify</button></td>
 							</form>
 							<form action="reservationHandler" method="post">
 							<td><button type="submit" name="clerkDeleteReservation" value="${reservation.id}">Delete</button></td>
@@ -52,6 +52,9 @@
 				</tbody>
 				
 			</table>
+	</div>
+	<div>
+		<i> Notice: Any Cancellation made within 2 days of Start Date will incur a charge (80% of one-night) </i>
 	</div>
 </body>
 </html>

@@ -23,7 +23,7 @@
 			<div class="container">
 				<div class="signup-content">
 					<div class="signup-form">
-						<h2 class="form-title">Modify Reservation</h2>
+						<h1 class="form-title">Modify Reservation</h1>
 						<%
 						  String warning = (String) request.getAttribute("warning");						 
 						  if (warning == null || warning == "") {%>
@@ -32,7 +32,7 @@
 						  } else {%>
 							  <p><b><%= warning %></b></p>
 						 <% }
-						%>
+						%>					
 						<form method="post" action="reservationHandler">
 							<div class="form-group">
 								<p><b>Start Date:</b><input type="date" name="startDate" id="startDate" placeholder="Start Date"/></p>

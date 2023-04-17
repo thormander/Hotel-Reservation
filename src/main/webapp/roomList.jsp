@@ -23,10 +23,6 @@ tr ]
 <body>
 
 
-
-
-<
-
 	<header>
 			<h1>Room Management:</h1>
 	</header>

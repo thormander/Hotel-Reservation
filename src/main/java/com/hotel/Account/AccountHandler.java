@@ -30,6 +30,8 @@ public class AccountHandler extends HttpServlet {
 	//doGet gets called 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	
+		//CHANGED doGet to PUBLIC as test classes needs to see it
+	
 		String accountType = request.getParameter("accountType");
 		switch(accountType)
 		
@@ -76,6 +78,14 @@ public class AccountHandler extends HttpServlet {
 			System.out.println("modify billing executed!");
 			modifyBilling(request,response);
 			break;
+		case "redeemPoint":
+			System.out.println("Redeemed!");
+			redeemPoint(request,response);
+			break;
+		case "searchGuest": //searchGuest.jsp
+			System.out.println("search guest executed");
+			searchGuest(request,response);
+			break;
 		default: //default to logout (Can change to a switch case if needed)
 			System.out.println("logout executed!");
 			logout(request,response);
@@ -99,7 +109,19 @@ public class AccountHandler extends HttpServlet {
 	    String employer = request.getParameter("companyName");
 
 	    HttpSession session = request.getSession();
+	    String accountType = (String) session.getAttribute("type");
 	    String currentUser = (String) session.getAttribute("email");
+	    boolean clerkLoggedIn = false;
+	    // Checking for clerk credentials
+ 		if (accountType.compareTo("clerk") == 0)
+ 		{
+ 			// sets the accountType to guest as all reservations are under guests
+ 			String guestType = (String) "guest";
+ 			accountType = guestType;
+ 			// sets the currentUser to the reservationName as this is what the reservation will be under
+ 			currentUser = (String) session.getAttribute("guestEmailName");
+ 			clerkLoggedIn = true;
+ 		}
 
 	    RequestDispatcher dispatcher = null;
 	    Connection con = null;
@@ -107,8 +129,8 @@ public class AccountHandler extends HttpServlet {
 	    try {
 			Class.forName("com.mysql.cj.jdbc.Driver");
 			//CONNECTION TO DB (change "hotel" to whatever you database name is.)
-			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=UTC","root", "12345678");
-
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC","root", "12345678");
+			
 	        String updateQuery = "UPDATE account SET ccNum=?, ccExp=?, ccAddress=?"
 	                + (billingCompany != null ? ", employer=?" : "")
 	                + " WHERE email_id=?";
@@ -117,10 +139,16 @@ public class AccountHandler extends HttpServlet {
 	        modifyQuery.setString(1, ccNum);
 	        modifyQuery.setString(2, ccExp);
 	        modifyQuery.setString(3, ccAddress);
+	        
+	        /* For displaying current billing information */
+	        session.setAttribute("ccNum", ccNum);
+	        session.setAttribute("ccExp", ccExp);
+	        session.setAttribute("ccAddress", ccAddress);
 
 	        if (billingCompany != null) {
 	            modifyQuery.setString(4, employer);
 	            modifyQuery.setString(5, currentUser);
+	            
 	            System.out.println("Employer Billing Address Added!");
 	        } else {
 	            modifyQuery.setString(4, currentUser);
@@ -129,8 +157,16 @@ public class AccountHandler extends HttpServlet {
 	        modifyQuery.executeUpdate();
 
 	        con.close();
-
-	        dispatcher = request.getRequestDispatcher("index.jsp");
+	        
+	        if (clerkLoggedIn)
+	        {
+	        	dispatcher = request.getRequestDispatcher("searchGuest.jsp");
+	        }
+	        else
+	        {
+	        	dispatcher = request.getRequestDispatcher("index.jsp");
+	        }
+	        
 	        dispatcher.forward(request, response);
 
 	    } catch (Exception e) {
@@ -155,7 +191,7 @@ public class AccountHandler extends HttpServlet {
 	/*registerClerk:
 	 *	This function registers a new clerk account by inserting the user's information into the database.
 	 * */
-	private void registerClerk(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	public void registerClerk(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String username = request.getParameter("name");
 		String uemail = request.getParameter("email");
 		String upass = request.getParameter("pass");
@@ -169,7 +205,7 @@ public class AccountHandler extends HttpServlet {
 		{
 			Class.forName("com.mysql.cj.jdbc.Driver");
 			//CONNECTION TO DB (change "hotel" to whatever you database name is.)
-			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=UTC","root", "12345678");
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC","root", "12345678");
 			//SQL query to database here. (PLEASE NAME YOUR DB TO hotel)
 			PreparedStatement pst = con.prepareStatement("INSERT INTO account(user_name,email_id,password,type) values(?,?,?,'clerk')");
 			pst.setString(1, username);
@@ -190,7 +226,7 @@ public class AccountHandler extends HttpServlet {
 			        out.flush();
 			        out.close();
 		        }
-		        
+				
 				request.setAttribute("status", "success");
 			}
 			else
@@ -202,7 +238,6 @@ public class AccountHandler extends HttpServlet {
 			if (testMode == false) {
 				dispatcher.forward(request, response);			
 			}
-
 			
 		}
 		catch (java.sql.SQLIntegrityConstraintViolationException e)
@@ -232,7 +267,7 @@ public class AccountHandler extends HttpServlet {
 	/* registerGuest:
 	 * 	This function registers a new guest account by inserting the user's information into the database.
 	 * */
-	private void registerGuest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException { //changed to public for junit testing
+	public void registerGuest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException { //changed to public for junit testing
 		String username = request.getParameter("name");
 		String uemail = request.getParameter("email");
 		String upass = request.getParameter("pass");
@@ -247,7 +282,7 @@ public class AccountHandler extends HttpServlet {
 			Class.forName("com.mysql.cj.jdbc.Driver");
 			
 			//CONNECTION TO DB (change "hotel" to whatever you database name is.)
-			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=UTC","root", "12345678");
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC","root", "12345678");
 			//SQL query to database here
 			PreparedStatement pst = con.prepareStatement("INSERT INTO account(user_name,email_id,password,type,points) values(?,?,?,'guest',0)");
 			pst.setString(1, username);
@@ -280,6 +315,7 @@ public class AccountHandler extends HttpServlet {
 			if (testMode == false) {
 				dispatcher.forward(request, response);
 			}
+			
 		}
 		catch (java.sql.SQLIntegrityConstraintViolationException e)
 		{
@@ -308,7 +344,7 @@ public class AccountHandler extends HttpServlet {
 	/* modifyClerk:
 	 * 	This function updates the password for an existing clerk account in the database.
 	 * */
-	private void modifyClerk(HttpServletRequest request, HttpServletResponse response) {
+	public void modifyClerk(HttpServletRequest request, HttpServletResponse response) {
 		
 		String uemail = request.getParameter("email");
 		String upass = request.getParameter("pass");
@@ -366,7 +402,7 @@ public class AccountHandler extends HttpServlet {
 	/* modifyGuest:
 	 *	This function updates the password for an existing guest account in the database.
 	 * */
-	private void modifyGuest(HttpServletRequest request, HttpServletResponse response) {
+	public void modifyGuest(HttpServletRequest request, HttpServletResponse response) {
 		
 		String uemail = request.getParameter("email");
 		String upass = request.getParameter("pass");
@@ -393,7 +429,7 @@ public class AccountHandler extends HttpServlet {
 			
 			pst.executeUpdate();
 			
-			request.setAttribute("modifySuccess", true);			
+			request.setAttribute("modifySuccess", true);
 			request.setAttribute("message", "Password modified!");
 			
 			dispatcher = request.getRequestDispatcher("modifyGuest.jsp");
@@ -404,7 +440,7 @@ public class AccountHandler extends HttpServlet {
 		catch (Exception e) 
 		{
 			e.printStackTrace();
-		}
+		} 
 		finally
 		{
 			try
@@ -422,7 +458,7 @@ public class AccountHandler extends HttpServlet {
 	/*AdminSignIn:
 	 * 	This function handles the login process for an admin account. It verifies the user's credentials and redirects to the admin index.
 	 * */
-	private void AdminSignIn(HttpServletRequest request, HttpServletResponse response) {
+	public void AdminSignIn(HttpServletRequest request, HttpServletResponse response) {
 
 		String uemail = request.getParameter("username");
 		String upass = request.getParameter("password");
@@ -434,7 +470,7 @@ public class AccountHandler extends HttpServlet {
 		{
 			Class.forName("com.mysql.cj.jdbc.Driver");
 			//CONNECTION TO DB (change "hotel" to whatever you database name is.)
-			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=UTC","root", "12345678");
+			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC","root", "12345678");
 			//SQL query to database here. (PLEASE NAME YOUR DB TO hotel)
 			PreparedStatement pst = con.prepareStatement("SELECT * FROM account WHERE email_id = ? AND password = ? AND type = 'admin'");
 			
@@ -444,8 +480,7 @@ public class AccountHandler extends HttpServlet {
 			ResultSet rs = pst.executeQuery();
 			if (rs.next())
 			{
-				//response.getWriter().write("status=success"); //used for unit test to ensure it passed query
-				request.setAttribute("status", "success");
+				request.setAttribute("status", "success"); //used for unit test to ensure it passed query
 				
 				session.setAttribute("name", rs.getString("user_name"));
 				session.setAttribute("email", rs.getString("email_id"));
@@ -481,7 +516,7 @@ public class AccountHandler extends HttpServlet {
 		{
 			Class.forName("com.mysql.cj.jdbc.Driver");
 			//CONNECTION TO DB (change "hotel" to whatever you database name is.)
-			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=UTC","root", "12345678");
+			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC","root", "12345678");
 			//SQL query to database here. (PLEASE NAME YOUR DB TO hotel)
 			PreparedStatement pst = con.prepareStatement("SELECT * FROM account WHERE email_id = ? AND password = ? AND type = 'clerk'");
 			
@@ -489,7 +524,6 @@ public class AccountHandler extends HttpServlet {
 			pst.setString(2, upass);
 			
 			ResultSet rs = pst.executeQuery();
-			System.out.println(rs);
 
 			if (rs.next())
 			{
@@ -519,8 +553,14 @@ public class AccountHandler extends HttpServlet {
 	/* GuestSignIn:
 	 * 	 This function handles the login process for a guest account. It verifies the user's credentials against the database and redirects to the guest index.
 	 */
-	private void GuestSignIn(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {		String uemail = request.getParameter("username");
+	public void GuestSignIn(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {		
+		String uemail = request.getParameter("username");
 		String upass = request.getParameter("password");
+		
+		/* For displaying current billing information */
+		String ccNum = "";
+		String ccExp = "";
+		String ccAddress = "";
 		
 		HttpSession session = request.getSession();
 		RequestDispatcher dispatcher = null;
@@ -529,7 +569,7 @@ public class AccountHandler extends HttpServlet {
 		{
 			Class.forName("com.mysql.cj.jdbc.Driver");
 			//CONNECTION TO DB (change "hotel" to whatever you database name is.)
-			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?useSSL=false&serverTimezone=UTC","root", "12345678");
+			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC","root", "12345678");
 			//SQL query to database here. (PLEASE NAME YOUR DB TO hotel)
 			PreparedStatement pst = con.prepareStatement("SELECT * FROM account WHERE email_id = ? AND password = ? AND type = 'guest'");
 			
@@ -547,6 +587,7 @@ public class AccountHandler extends HttpServlet {
 				
 				//Display user points on login on index
 				int guestPoints = rs.getInt("points");
+				request.setAttribute("guestPoints", guestPoints);
 				session.setAttribute("guestPoints", guestPoints);
 				
 				dispatcher = request.getRequestDispatcher("index.jsp");
@@ -556,6 +597,25 @@ public class AccountHandler extends HttpServlet {
 				request.setAttribute("status", "failed");
 				dispatcher = request.getRequestDispatcher("login.jsp");
 			}
+			
+			/* Obtain billing information from specific guest */
+			String billingInfoQuery = "SELECT ccNum, ccExp, ccAddress FROM hotel.account WHERE email_id = ?";
+			
+			PreparedStatement biQuery = con.prepareStatement(billingInfoQuery);
+			biQuery.setString(1, uemail);
+			
+			rs = biQuery.executeQuery();
+			if (rs.next())
+			{	
+				ccNum = rs.getString("ccNum");
+				ccExp = rs.getString("ccExp");
+				ccAddress = rs.getString("ccAddress");
+			}
+		
+			/* For displaying current billing information */
+	        session.setAttribute("ccNum", ccNum);
+	        session.setAttribute("ccExp", ccExp);
+	        session.setAttribute("ccAddress", ccAddress);
 			
 			dispatcher.forward(request, response);
 			
@@ -569,7 +629,7 @@ public class AccountHandler extends HttpServlet {
 	/* modifyAdmin:
 	 *	This function updates the password for an existing guest account in the database.
 	 * */
-	private void modifyAdmin(HttpServletRequest request, HttpServletResponse response) {
+	public void modifyAdmin(HttpServletRequest request, HttpServletResponse response) {
 		
 		String uemail = request.getParameter("email");
 		String upass = request.getParameter("pass");
@@ -623,6 +683,87 @@ public class AccountHandler extends HttpServlet {
 			}
 		}
 		
+	}
+	
+	/* Search Guest 
+	 * This function checks a guest entry against the guest accounts in the database
+	 */
+	public void searchGuest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		String uemail = request.getParameter("guestEmailName");
+		
+		HttpSession session = request.getSession();
+		RequestDispatcher dispatcher = null;
+		
+		session.setAttribute("guestEmailName", uemail);
+		
+		String guest = (String) "guest";
+		session.setAttribute("guestType", guest);
+		
+		try 
+		{
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			//CONNECTION TO DB (change "hotel" to whatever you database name is.)
+			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC","root", "12345678");
+			//SQL query to database here. (PLEASE NAME YOUR DB TO hotel)
+			PreparedStatement pst = con.prepareStatement("SELECT * FROM account WHERE email_id = ? AND type = 'guest'");
+			
+			pst.setString(1, uemail);
+			
+			ResultSet rs = pst.executeQuery();
+			if (rs.next())
+			{
+				request.setAttribute("status", "success"); //used for unit test to ensure it passed query
+				
+				//Display user points on login on index
+				int guestPoints = rs.getInt("points");
+				session.setAttribute("guestPoints", guestPoints);
+				
+				dispatcher = request.getRequestDispatcher("searchGuest.jsp");
+			}
+			else
+			{
+				request.setAttribute("status", "failed");
+				dispatcher = request.getRequestDispatcher("indexClerk.jsp");
+			}
+			
+			dispatcher.forward(request, response);
+			
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		
+		
+	}
+	
+	private void redeemPoint(HttpServletRequest request, HttpServletResponse response) {
+		RequestDispatcher dispatcher = null;
+		Connection con = null;
+		
+		try 
+		{
+			HttpSession session = request.getSession();
+			String email = (String) session.getAttribute("email");
+			
+
+			Class.forName("com.mysql.cj.jdbc.Driver");			
+			//CONNECTION TO DB (change "hotel" to whatever you database name is.)
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC","root", "12345678");
+			//SQL query to database here
+			PreparedStatement pst = con.prepareStatement("UPDATE `hotel`.`account` SET `points` = 0 WHERE `email_id` = ?");	
+			request.setAttribute("guestPoints",0);
+			pst.setString(1,email);
+			pst.executeUpdate();
+			
+			dispatcher = request.getRequestDispatcher("index.jsp");
+			
+			dispatcher.forward(request, response);
+			
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 }

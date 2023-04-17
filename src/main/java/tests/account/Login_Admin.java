@@ -30,6 +30,7 @@ class Login_Admin {
         assertTrue(responseBody.contains("Welcome Admin!"));
     }
 }
+
 /* ON SUCCESS: this means test case received the 'success' from the method for a normal execution of the function (and user is present on database)
  * ON FAIL: means the login credentials were not in the correct format
  * */

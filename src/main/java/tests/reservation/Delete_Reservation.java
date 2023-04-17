@@ -31,7 +31,7 @@ public class Delete_Reservation {
         httpPost.setHeader("Content-Type", "application/x-www-form-urlencoded");
 
         List<NameValuePair> params = new ArrayList<>();
-        params.add(new BasicNameValuePair("reservationStep", "deleteReservation"));
+        params.add(new BasicNameValuePair("reservationAction", "deleteReservation"));
         params.add(new BasicNameValuePair("email", "junitTest@test.com"));
         params.add(new BasicNameValuePair("type", "junittest"));
         params.add(new BasicNameValuePair("deleteParams", "37")); //change ID here to match test reservation case you want to delete

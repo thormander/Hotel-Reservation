@@ -18,22 +18,36 @@
 
 <!------------------------------------------------------------------------------------------------------------------->
 <body>
-	<a href="modifyClerk.jsp">Modify Account?</a>
 	<h1>Clerk Dashboard</h1>
-	<a href="roomList.jsp">Access Room List</a>
 	<div>
-		<h3>View Reservations</h3>
+		<h2>Room List</h2>
+		<form action="roomList.jsp" method="post">
+			<button type="submit">View Room List</button>
+		</form>
+	</div>
+	<div>
+		<h2>View Reservations</h2>
 		<form action="reservationHandler" method="post">
-			<input type="hidden" name="reservationStep" value="clerkViewReservations">
+			<input type="hidden" name="reservationAction" value="clerkViewReservations">
 			<button type="submit">View Reservations</button>
 		</form>
 	</div>
-	
+	<div>
+		<h2>Guest Lookup</h2>
+		<form action="accountHandler" method="post">
+			<input type="hidden" name="accountType" value="searchGuest">
+			<div>
+				<input type="email" placeholder="Guest Email" name="guestEmailName"></input>
+			</div>
+			
+			<button type="submit">Search Guest</button>
+		</form>
+	</div>
 	
 	<div>
 		<h2>Checkout Guest</h2>
 		<form action="reservationHandler" method="post">
-			<input type="hidden" name="reservationStep" value="checkOutStart">
+			<input type="hidden" name="reservationAction" value="checkOutStart">
 			<div>
 				<input type="email" placeholder="Guest Email" name="emailName" required="required"></input>
 			</div>
@@ -44,12 +58,14 @@
 	<br>
 	<div>
 		<form action="reservationHandler" method="post">
-			<input type="hidden" name="reservationStep" value="generateBillingSummary">
+			<input type="hidden" name="reservationAction" value="generateBillingSummary">
 			<button type="submit">Get Billing Summary</button>
 		</form>
 	</div>
 	<br>
 	<br>
+	
+	<a href="modifyClerk.jsp">Modify Account?</a>
 
 	<form action="accountHandler" method="post">
 		<input type="hidden" name="accountType" value="logout">

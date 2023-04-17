@@ -1,7 +1,7 @@
 <%
 	if(session.getAttribute("name")==null)
 	{
-		response.sendRedirect("login.jsp");
+		response.sendRedirect("loginClerk.jsp");
 	}
 %>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
@@ -20,7 +20,7 @@
 
 
 <body>
-	<h1>Billing Information</h1>
+	<h1>Guest Billing Information</h1>
 	
 	<table border = "1">
 		<thead>
@@ -89,5 +89,5 @@
 	      }
 	</script>
 </body>
-<a href="index.jsp">Back to account home?</a>
+<a href="indexClerk.jsp">Back to account home?</a>
 </html>

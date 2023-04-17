@@ -1,7 +1,7 @@
 <%
 	if(session.getAttribute("name")==null)
 	{
-		response.sendRedirect("index.jsp");
+		response.sendRedirect("indexClerk.jsp");
 	}
 %>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
@@ -12,11 +12,11 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Reservations</title>
+<title>Guest Reservations</title>
 </head>
 <body>
-<a href="index.jsp">Return to Account</a>
-<h1>Manage Reservations</h1>
+<a href="searchGuest.jsp">Return back to dashboard</a>
+<h1>Manage Guest Reservations</h1>
 <div class="row">
 	
 		<div class="container">
@@ -40,22 +40,27 @@
 							<td><c:out value="${reservation.endDate}" /></td>
 							<td><c:out value="${reservation.roomInformation}" /></td>
 							<td><c:out value="${reservation.checkInDate}" /></td>
+							
 							<form action=reservationHandler method="post">
-							<td>
-								<button type="submit" name="editReservation" value="${reservation.roomId}-${reservation.id}">Modify</button></td>
+							<input type="hidden" name="reservationAction" value="checkInStart"></input>
+							<td><button type="submit" value="${reservation.id}" name="reservationID">Check-In</button></td>
 							</form>
+							
+						    <form action=reservationHandler method="post">
+								<td><button type="submit" name="clerkEditReservation" value="${reservation.roomId}-${reservation.id}">Modify</button></td>
+							</form>
+							
 							<form action="reservationHandler" method="post">
-							<td><button type="submit" name="deleteReservation" value="${reservation.id}">Delete</button></td>
+							<td><button type="submit" name=clerkDeleteReservation value="${reservation.id}">Delete</button></td>
 							</form>
 						</tr>
 					</c:forEach>
 				</tbody>
 				
 			</table>
-      	</div>
 		<div>
 			<i> Notice: Any Cancellation made within 2 days of Start Date will incur a charge (80% of one-night) </i>
 		</div>
-</div>
+	</div>
 </body>
 </html>

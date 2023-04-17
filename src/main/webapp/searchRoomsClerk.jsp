@@ -5,7 +5,7 @@
 
 <html>
 <head>
-<title>Create Reservation</title>
+<title>Create Reservation for Guest</title>
 <style>
 table 
 {
@@ -97,7 +97,7 @@ tr ]
 				</form>
 			</div>
 		</div>
-		<a href="index.jsp">Go back to dashboard</a>
+		<a href="searchGuest.jsp">Return back to dashboard</a>
 	</div>
 </body>
 </html>

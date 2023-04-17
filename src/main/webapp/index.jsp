@@ -20,13 +20,17 @@
 <body>
 	<h1>Welcome ${sessionScope.name}!</h1>
 	<p>Your current points: ${sessionScope.guestPoints}</p>
+	<form action="accountHandler" method="post">
+		<input type="hidden" name="accountType" value="redeemPoint">
+		<button type="submit" value="${sessionScope.email}">Redeem</button>
+	</form>
 	<ul>
 		<li><a href="modifyGuest.jsp">Modify Account?</a></li>
 		<li><a href="accountbilling.jsp?sessionValue=${sessionScope.email}">Add or Modify Billing information?</a></li>
 		<li><a href="searchRooms.jsp">Search Rooms?</a></li>
 	</ul>
 	<form action="reservationHandler" method="post">
-		<input type="hidden" name="reservationStep" value="getReservations">
+		<input type="hidden" name="reservationAction" value="getReservations">
 		<button type="submit" value="${sessionScope.email}">My Reservations</button>
 	</form>
 	<form action="accountHandler" method="post">
