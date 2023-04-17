@@ -38,7 +38,7 @@
   - `CREATE DATABASE hotel;`
   - `USE hotel;`
 - Run the following commands from the .txt files below in order:
-  - [SqlCreate.txt](https://github.com/thormander/Hotel-Reservation/files/11224437/SqlCreate.txt)
+  - [SqlCreate.txt](https://github.com/thormander/Hotel-Reservation/files/11256004/SqlCreate.txt)
   - [40roomsINSERT.txt](https://github.com/thormander/Hotel-Reservation/files/11224624/40roomsINSERT.txt)
 - Insert the admin user
   - ```INSERT INTO `hotel`.`account` (`user_name`, `email_id`, `password`, `type`) VALUES ('admin', 'admin@test.com', 'admin', 'admin');``` 
