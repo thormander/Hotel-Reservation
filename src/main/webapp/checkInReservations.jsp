@@ -51,6 +51,6 @@
 			</div>
 	</form>
 	
-	<a href="searchGuest.jsp">Return back to Guest dashboard?</a>
+	<a href="searchGuest.jsp">Return back to dashboard?</a>
 </body>
 </html>

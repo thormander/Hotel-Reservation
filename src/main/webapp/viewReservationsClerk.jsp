@@ -16,7 +16,7 @@
 </head>
 <body>
 <a href="searchGuest.jsp">Return back to dashboard</a>
-<h1>Manage Guest Reservations</h1>
+<h1>Manage Reservations</h1>
 <div class="row">
 	
 		<div class="container">

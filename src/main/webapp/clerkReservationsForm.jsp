@@ -33,23 +33,6 @@
 							  <p><b><%= warning %></b></p>
 						 <% }
 						%>
-						<h2>Reservation Information</h2>
-	
-						<table border = "1">
-							<thead>
-								<tr>
-									<th>Start Date</th>
-									<th>End Date</th>
-								</tr>
-							</thead>
-							
-							<tbody>
-									<tr>
-										<td><c:out value="${startDate}"/></td>
-										<td><c:out value="${endDate}"/></td>
-									</tr>
-							</tbody>
-						</table>
 						
 						<form method="post" action="reservationHandler">
 							<div class="form-group">

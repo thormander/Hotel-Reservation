@@ -49,121 +49,180 @@ public class ReservationHandler extends HttpServlet {
 		String clerkSubmitReservationForm = request.getParameter("clerkSubmitReservation");
 		String clerkDeleteButton = request.getParameter("clerkDeleteReservation");
 
-
-
+		HttpSession session = request.getSession();
+		RequestDispatcher dispatcher = null;
+		ResultSet rs;
 		
-		if (reservationAction == "" || reservationAction == null) {
-			reservationAction = determinereservationAction(editButton, deleteButton, returnToMyReservations, submitReservationForm,clerkEditButton, clerkSubmitReservationForm, clerkDeleteButton);
-		}
+		try {
+			
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			//CONNECTION TO DB (change "hotel" to whatever you database name is.)
+			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hotel?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC","root", "12345678");
 		
-		System.out.println(reservationAction);
-		switch(reservationAction)
+			if (reservationAction == "" || reservationAction == null) {
+				reservationAction = determinereservationAction(editButton, deleteButton, returnToMyReservations, submitReservationForm,clerkEditButton, clerkSubmitReservationForm, clerkDeleteButton);
+			}
 		
-		{
-		case "startReservation": 
-			System.out.println("start reservation executed!");
-			StartReservation(request,response);
-			break;
+			System.out.println(reservationAction);
+			switch(reservationAction)
 			
-		case "createReservation": 
-			System.out.println("create reservation executed!");
-			CreateReservation(request,response);
-			break;
-		
-		case "editReservation": 
-			System.out.println("edit reservation executed!");
-			viewMyReservations(request, response, editButton);
-			break;
+			{
+			case "startReservation": 
+				System.out.println("start reservation executed!");
+				StartReservation(request,response);
+				break;
+				
+			case "createReservation": 
+				System.out.println("create reservation executed!");
+				CreateReservation(request,response);
+				break;
 			
-		case "deleteReservation": 
-			System.out.println("delete reservation executed!");
-			deleteReservations(request, response, deleteButton);
-			break;
-			
-		case "getReservations" : 
-			System.out.println("getReservation executed!");
-			viewMyReservations(request, response);
-			break;
-			
-		case "submitReservationModify": 
-			System.out.println("Modify reservation executed!");
-			
-			String startDate = request.getParameter("startDate");
-			String endDate = request.getParameter("endDate");
-			
-			if (endDate == null || startDate == null || endDate == "" || startDate == "") {
-				handleBlankFields(request, response, submitReservationForm);
-			} else {
-				String dateValidation = validateDates(startDate, endDate);
-				if (dateValidation == "") {
-					submitReservationUpdates(request, response, submitReservationForm, startDate, endDate);
-				} else {
-					invalidDateRedirect(request, response, dateValidation, submitReservationForm);
+			case "editReservation": 
+				System.out.println("edit reservation executed!");
+				viewMyReservations(request, response, editButton);
+				break;
+				
+			case "deleteReservation": 
+				System.out.println("delete reservation executed!");
+				deleteReservations(request, response, deleteButton);
+				break;
+				
+			case "getReservations" : 
+				System.out.println("getReservation executed!");
+				viewMyReservations(request, response);
+				break;
+				
+			case "submitReservationModify": 
+				
+				String[] submitReservationParams = submitReservationForm.split("-");
+				int reservation_id =  Integer.parseInt(submitReservationParams[1]);
+				
+				PreparedStatement checkedInQuery = con.prepareStatement("SELECT isCheckedIn FROM reservation WHERE reservationID=?");
+				checkedInQuery.setInt(1, reservation_id);
+				
+				rs = checkedInQuery.executeQuery();
+				
+				boolean isCheckedIn = false;
+				if(rs.next())
+				{
+					isCheckedIn = (rs.getInt("isCheckedIn") == 1) ? true : false;
 				}
-			}
-			break;
-			
-		case "returnToMyReservations": 
-			System.out.println("Return to reservations executed!");
-			viewMyReservations(request, response);
-			break;
-		case "checkInStart" : //viewReservationsClerk.jsp
-			System.out.println("checkin has begun!");
-			checkinStart(request, response);
-			break;
-		case "checkInConfirm" : //checkInReservations.jsp
-			System.out.println("checkin confirmation has begun");
-			checkinConfirm(request, response);
-			break;
-		case "checkOutStart": //viewReservationsClerk.jsp
-			System.out.println("checkout has begun!");
-			checkoutStart(request, response);
-			break;
-		case "checkOutConfirm": //checkOutReservations.jsp
-			System.out.println("Confirm checkout has begun!");
-			try {
-				checkoutBillingConfirm(request, response);  // --> THIS IS A BIG BOI
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
-			}
-			break;
-		case "generateBillingSummary": //index clerk.jsp
-			System.out.println("billing summary executed!");
-			List<Bill> billingSummary = selectAllBills(request, response);
-			request.setAttribute("billSummary", billingSummary);
-		    RequestDispatcher dispatcher = request.getRequestDispatcher("generateBillSummary.jsp");
-		    dispatcher.forward(request, response);
-			break;
-		case "clerkViewReservations": //indexClerk.jsp
-			clerkViewReservations(request, response);
-			break;
-		case "clerkEditReservation": //indexClerk.jsp
-			clerkViewReservations(request, response, clerkEditButton);
-			break;
-		case "clerkSubmitReservation": //indexClerk.jsp
-			System.out.println("Modify reservation executed!");
-			
-			String clerkStartDate = request.getParameter("startDate");
-			String clerkEndDate = request.getParameter("endDate");
-			String guestEmail = request.getParameter("reservationEmail");
-			
-			if (clerkEndDate == null || clerkStartDate == null || clerkEndDate == "" || clerkStartDate == "") {
-				clerkHandleBlankFields(request, response, clerkSubmitReservationForm);
-			} else {
-				String dateValidation = validateDates(clerkStartDate, clerkEndDate);
-				if (dateValidation == "") {
-					clerkSubmitReservationUpdates(request, response, clerkSubmitReservationForm, clerkStartDate, clerkEndDate, guestEmail);
-				} else {
-					clerkInvalidDateRedirect(request, response, dateValidation, clerkSubmitReservationForm);
+				
+				if (isCheckedIn == false)
+				{
+					System.out.println("Modify reservation executed!");
+					
+					String startDate = request.getParameter("startDate");
+					String endDate = request.getParameter("endDate");
+					
+					if (endDate == null || startDate == null || endDate == "" || startDate == "") {
+						handleBlankFields(request, response, submitReservationForm);
+					} else {
+						String dateValidation = validateDates(startDate, endDate);
+						if (dateValidation == "") {
+							submitReservationUpdates(request, response, submitReservationForm, startDate, endDate);
+						} else {
+							invalidDateRedirect(request, response, dateValidation, submitReservationForm);
+						}
+					}
 				}
+				else
+				{
+					System.out.println("Warning: Attempt to change checked-in reservation");
+					dispatcher = request.getRequestDispatcher("index.jsp");
+					dispatcher.forward(request, response);
+				}
+				break;
+				
+			case "returnToMyReservations": 
+				System.out.println("Return to reservations executed!");
+				viewMyReservations(request, response);
+				break;
+			case "checkInStart" : //viewReservationsClerk.jsp
+				System.out.println("checkin has begun!");
+				checkinStart(request, response);
+				break;
+			case "checkInConfirm" : //checkInReservations.jsp
+				System.out.println("checkin confirmation has begun");
+				checkinConfirm(request, response);
+				break;
+			case "checkOutStart": //viewReservationsClerk.jsp
+				System.out.println("checkout has begun!");
+				checkoutStart(request, response);
+				break;
+			case "checkOutConfirm": //checkOutReservations.jsp
+				System.out.println("Confirm checkout has begun!");
+				try {
+					checkoutBillingConfirm(request, response);  // --> THIS IS A BIG BOI
+				} catch (ClassNotFoundException e) {
+					e.printStackTrace();
+				}
+				break;
+			case "generateBillingSummary": //index clerk.jsp
+				System.out.println("billing summary executed!");
+				List<Bill> billingSummary = selectAllBills(request, response);
+				request.setAttribute("billSummary", billingSummary);
+			    dispatcher = request.getRequestDispatcher("generateBillSummary.jsp");
+			    dispatcher.forward(request, response);
+				break;
+			case "clerkViewReservations": //indexClerk.jsp
+				clerkViewReservations(request, response);
+				break;
+			case "clerkEditReservation": //indexClerk.jsp
+				clerkViewReservations(request, response, clerkEditButton);
+				break;
+			case "clerkSubmitReservation": //indexClerk.jsp
+				String[] clerkReservationParams = clerkSubmitReservationForm.split("-");
+				int clerk_reservation_id =  Integer.parseInt(clerkReservationParams[1]);
+				
+				PreparedStatement clerkCheckedInQuery = con.prepareStatement("SELECT isCheckedIn FROM reservation WHERE reservationID=?");
+				clerkCheckedInQuery.setInt(1, clerk_reservation_id);
+				
+				rs = clerkCheckedInQuery.executeQuery();
+				
+				isCheckedIn = false;
+				if(rs.next())
+				{
+					isCheckedIn = (rs.getInt("isCheckedIn") == 1) ? true : false;
+				}
+				
+				if (isCheckedIn == false)
+				{
+				
+					System.out.println("Modify reservation executed!");
+					
+					String clerkStartDate = request.getParameter("startDate");
+					String clerkEndDate = request.getParameter("endDate");
+					String guestEmail = request.getParameter("reservationEmail");
+					
+					if (clerkEndDate == null || clerkStartDate == null || clerkEndDate == "" || clerkStartDate == "") {
+						clerkHandleBlankFields(request, response, clerkSubmitReservationForm);
+					} else {
+						String dateValidation = validateDates(clerkStartDate, clerkEndDate);
+						if (dateValidation == "") {
+							clerkSubmitReservationUpdates(request, response, clerkSubmitReservationForm, clerkStartDate, clerkEndDate, guestEmail);
+						} else {
+							clerkInvalidDateRedirect(request, response, dateValidation, clerkSubmitReservationForm);
+						}
+					}
+				}
+				else 
+				{
+					System.out.println("Warning: Attempt to change checked-in reservation");
+					dispatcher = request.getRequestDispatcher("indexClerk.jsp");
+					dispatcher.forward(request, response);
+				}
+				break;
+			case "clerkDeleteReservation": //loginClerk.jsp
+				clerkDeleteReservations(request, response, clerkDeleteButton);
+				break;
+			default:
+				System.out.println("nothing executed in reservationHandler ! :(");
+				break;
 			}
-			break;
-		case "clerkDeleteReservation": //loginClerk.jsp
-			clerkDeleteReservations(request, response, clerkDeleteButton);
-			break;
-		default:
-			System.out.println("nothing executed in reservationHandler ! :(");
-			break;
+		
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		
 	}
@@ -821,7 +880,7 @@ public class ReservationHandler extends HttpServlet {
 				deleteDateData[month].compareTo(startDateData[month]) == 0 &&
 				Integer.valueOf(startDateData[day]) - Integer.valueOf(deleteDateData[day]) <= 2)
 			{
-				issueCancellationFee = true;
+				issueCancellationFee = (isCheckedIn == false) ? true : false;
 			}
 			
 			/* Missing billing information from guest */
@@ -998,7 +1057,7 @@ public class ReservationHandler extends HttpServlet {
 
 			ResultSet rs = currentReservations.executeQuery();
 			if (rs.next()) {
-				request.setAttribute("warning", "This room is already reserved for the dates you provided. Please try different dates.");
+				request.setAttribute("warning", "This room is already reserved for the dates you provided OR . Please try different dates.");
 				request.setAttribute("reservationId", submitReservationForm);
 				
 				dispatcher = request.getRequestDispatcher("reservationsForm.jsp");
@@ -1573,8 +1632,9 @@ public class ReservationHandler extends HttpServlet {
 				deleteDateData[month].compareTo(startDateData[month]) == 0 &&
 				Integer.valueOf(startDateData[day]) - Integer.valueOf(deleteDateData[day]) <= 2)
 			{
-				issueCancellationFee = true;
+				issueCancellationFee = (isCheckedIn == false) ? true : false;
 			}
+			
 	
 			/* Missing billing information from guest */
 			if (ccNum.compareTo("") == 0 || ccExp.compareTo("") == 0 || ccAddress.compareTo("") == 0)

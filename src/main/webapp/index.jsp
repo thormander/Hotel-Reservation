@@ -19,7 +19,7 @@
 <!------------------------------------------------------------------------------------------------------------------->
 <body>
 	<h1>Welcome ${sessionScope.name}!</h1>
-	<p>Your current points: ${sessionScope.guestPoints}</p>
+	<p>Your current points: ${guestPoints}</p>
 	<form action="accountHandler" method="post">
 		<input type="hidden" name="accountType" value="redeemPoint">
 		<button type="submit" value="${sessionScope.email}">Redeem</button>

@@ -41,7 +41,7 @@
 								<input type="password" name="passOld" id="pass" placeholder="Old Password" required="required"/>
 							</div>							
 							<div class="form-group">
-								<input type="password" name="passOld" id="passOld" placeholder="Old Password" required="required"/>
+								<input type="password" name="pass" id="pass" placeholder="New Password" required="required"/>
 							</div>
 							<div class="form-group form-button">
 								<input type="submit" name="signup" id="signup"
