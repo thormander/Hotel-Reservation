@@ -46,7 +46,7 @@ class Create_Reservation {
 
         // Set the request parameters
         List<NameValuePair> params = new ArrayList<>();
-        params.add(new BasicNameValuePair("reservationStep", "createReservation"));
+        params.add(new BasicNameValuePair("reservationAction", "createReservation"));
         params.add(new BasicNameValuePair("roomId", "9999"));
         params.add(new BasicNameValuePair("startDate", "9999-04-10"));
         params.add(new BasicNameValuePair("endDate", "9999-04-15"));
