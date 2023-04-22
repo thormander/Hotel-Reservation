@@ -63,7 +63,7 @@ https://user-images.githubusercontent.com/71967190/231578675-f542a1ab-8227-4ded-
 
 
 - (I have tried directly importing the project, but eclipse does not recoginze any of the files when it is done this way)
-- Copy the files from the repository and paste it into the newly created project. (Just select the contents and paste it into the project folder)
+- Copy the files from the repository and paste it into the newly created project. (Just select the contents and paste it into the project folder); I would recommend cloning the repository then just copy pasting from there.
   - If Junit 5 is not installed yet, add it to the library by right clicking on project -> 'Build Path' -> 'Configure Build path'
   - Go to 'Libraries' -> click on 'Classpath' -> 'Add Library...' -> 'Junit 5'
   
