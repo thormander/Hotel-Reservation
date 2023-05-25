@@ -28,7 +28,7 @@
 - IDE: [Eclipse EE](https://www.eclipse.org/downloads/packages/release/2023-03/r/eclipse-ide-enterprise-java-and-web-developers) (Make sure to use EE!)
 - Tests: JUnit 5
 
-## Installation
+## Installation Guide
 ### MySQL:
 - Ensure the name of the admin user is 'root' and the password is '12345678'
 - [Mac Installation Tutorial](https://www.youtube.com/watch?v=nj3nBCwZaqI&t=237s)
