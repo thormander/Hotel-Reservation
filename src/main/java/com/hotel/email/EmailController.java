@@ -10,8 +10,12 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 public class EmailController {
-    private final String fromEmail = "codingninjashotel@gmail.com";
-    private final String rand = "egzmmdrhwwxltazf";
+    private final String fromEmail = ""; // Your email here
+    private final String rand = ""; // Your email passcode here
+    /*
+     * If you are using gmail, you need to use a passcode from the third party login section,
+     * as it will not properly be able to login and send emails.
+     * */
 
     public void sendRegistrationConfirmationEmail(String toEmail, String username) {
         
