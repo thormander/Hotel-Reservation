@@ -8,6 +8,23 @@
 
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.0/css/bootstrap.min.css">
+   <style>
+    .bg-img {
+      position: fixed;
+      width: 100%;
+      height: 60%;
+      background-image: url('https://imgur.com/kpUZJOL.jpg');
+      background-repeat: no-repeat;
+      background-size: cover;
+      background-position: center;
+      z-index: -1; /* Make sure the image is behind the other elements */
+    }
+    
+    .content {
+      position: relative;
+      z-index: 1; /* Make sure the content is in front of the image */
+    }
+  </style>
 </head>
 <body>
   <nav class="navbar navbar-expand-lg navbar-dark bg-secondary">
@@ -29,7 +46,7 @@
       </div>
     </div>
   </nav>
-
+  <div class="bg-img"></div>
   <div class="container">
     <div class="row">
       <div class="col-lg-4 col-md-6 col-sm-12">
